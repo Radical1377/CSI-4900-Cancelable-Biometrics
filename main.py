@@ -10,7 +10,7 @@ from delaunay_triangulation.typing import Vertex
 
 R = 300 # Max Radial Distance
 
-SHOW_PIC = True
+SHOW_PIC = False
 
 # PCB Feature Set Params
 PCB_STEP_RHO = 5 # RANGE 5 to 20
@@ -28,7 +28,7 @@ NS = 1000 # Must divide LC
 
 # Projection Matrix Params
 PROJ_MAT_SEED = 1337 # Must be 32-bit integer
-PROJ_MAT_Y_DIM = 50 # Must be between 1-LC
+PROJ_MAT_Y_DIM = 300 # Must be between 1-LC
 
 # Delaunay Code Permutation Params
 PERM_PHI = 1
@@ -344,10 +344,10 @@ if __name__ == "__main__":
         with open(sys.argv[1], "r") as json_file:
             fingerprints = json.load(json_file)
 
-        files = []
-        for file in fingerprints["FILES"]:
-            if ("_1" in file) or ("_2" in file):
-                files.append(file)
+        files = fingerprints["FILES"]
+        #for file in fingerprints["FILES"]:
+        #    if ("_1" in file) or ("_2" in file):
+        #        files.append(file)
 
 
         """
@@ -356,8 +356,8 @@ if __name__ == "__main__":
         processed_data = []
 
         # Calculating raw SC_MAXs and SDs
-        for i in range(len(files[:10]) - 1):
-            for j in range(i+1, len(files[:10])):
+        for i in range(len(files) - 1):
+            for j in range(i+1, len(files)):
                 data = [files[i], files[j]]
                 print(files[i], ' vs ', files[j])
                 SC_MAX = calcSCMAX(eval(fingerprints[files[i]]["CT"]), eval(fingerprints[files[j]]["CT"]))
