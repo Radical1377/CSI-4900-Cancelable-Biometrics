@@ -3,6 +3,7 @@ import numpy as np
 import scipy.stats as stats
 from math import *
 from numpy import fft, linalg
+from matplotlib import pyplot as plt
 from PIL import Image, ImageDraw
 from delaunay_triangulation.triangulate import delaunay
 from delaunay_triangulation.typing import Vertex
@@ -248,10 +249,8 @@ def corr2(a,b):
     r = (a*b).sum() / sqrt((a*a).sum() * (b*b).sum())
     return r
 
-
-# Function for calculating the Final Score between Template and Query
-def FinalScore(CT,DT,CQ,DQ):
-
+# Function for calculating raw SC_MAX of a fingerprint pair
+def calcSCMAX(CT, CQ):
     SC = []
     for i in range(len(CT)):
         for j in range(len(CQ)):
@@ -261,15 +260,18 @@ def FinalScore(CT,DT,CQ,DQ):
             SC.append(tmp)
 
     SC = np.array(SC)
-    #SC = SC / linalg.norm(SC)
     SC_MAX = np.max(SC)
-    print("SC Max: ", SC_MAX)
+    return SC_MAX
 
+# Function for calculating raw SD of a fingerprint pair
+def calcSD(DT, DQ):
     SD = corr2(np.array(DT), np.array(DQ))
-    print("SD: ", SD)
+    return SD
+
+# Function for calculating the Final Score between normalized SC_MAX and SD
+def FinalScore(SC_MAX, SD):
 
     final_score = (FINAL_RHO * SC_MAX) + ((1 - FINAL_RHO) * SD)
-    print("Final Score: ", final_score)
     return final_score
 
 ## Main Program ##
@@ -335,9 +337,77 @@ if __name__ == "__main__":
     # if JSON file is given as argument
     elif os.path.isfile(sys.argv[1]) and str(sys.argv[1])[-5:] == '.json':
 
+
+
         # Load JSON
         print("Loading JSON...")
         with open(sys.argv[1], "r") as json_file:
             fingerprints = json.load(json_file)
 
-        
+        files = []
+        for file in fingerprints["FILES"]:
+            if ("_1" in file) or ("_2" in file):
+                files.append(file)
+
+
+        """
+            Processed Data row format: [file1, file2, raw/norm sc_max, raw/norm sd, final_score]
+        """
+        processed_data = []
+
+        # Calculating raw SC_MAXs and SDs
+        for i in range(len(files[:10]) - 1):
+            for j in range(i+1, len(files[:10])):
+                data = [files[i], files[j]]
+                print(files[i], ' vs ', files[j])
+                SC_MAX = calcSCMAX(eval(fingerprints[files[i]]["CT"]), eval(fingerprints[files[j]]["CT"]))
+                data.append(SC_MAX)
+                SD = calcSD(eval(fingerprints[files[i]]["DT"]), eval(fingerprints[files[j]]["DT"]))
+                data.append(SD)
+                processed_data.append(data)
+
+        # Normalizing SC_MAXs and SDs
+        SC_MAXs = list(zip(*processed_data))[2]
+        SDs = list(zip(*processed_data))[3]
+
+        for i in range(len(processed_data)):
+            processed_data[i][2] = (processed_data[i][2] - min(SC_MAXs)) / (max(SC_MAXs) - min(SC_MAXs))
+            processed_data[i][3] = (processed_data[i][3] - min(SDs)) / (max(SDs) - min(SDs))
+
+        # Adding final scores
+        for row in processed_data:
+            row.append(FinalScore(row[2], row[3]))
+
+        # Calculating FRR and FAR
+        threshold_step = 0.0001
+        FAR = []
+        FRR = []
+
+        for threshold in np.arange(0.0, 1.0, threshold_step):
+            print(threshold)
+            accepted_imposter = 0
+            total_imposter = 0
+            rejected_genuine = 0
+            total_genuine = 0
+            for row in processed_data:
+                # FAR Calculation
+                if row[0].split('_')[0] != row[1].split('_')[0]:
+                    total_imposter += 1
+                    if row[4] > threshold:
+                        accepted_imposter += 1
+
+                # FRR Calculation
+                if row[0].split('_')[0] == row[1].split('_')[0]:
+                    total_genuine += 1
+                    if row[4] < threshold:
+                        rejected_genuine += 1
+
+            FAR.append(accepted_imposter / total_imposter)
+            FRR.append(rejected_genuine / total_genuine)
+
+        # Plotting FAR and FRR based on threshold
+        print("FAR: ", FAR)
+        print("FRR: ", FRR)
+        plt.plot(list(np.arange(0.0, 1.0, threshold_step)),FRR,
+                list(np.arange(0.0, 1.0, threshold_step)), FAR)
+        plt.show()
