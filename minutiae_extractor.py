@@ -1,5 +1,4 @@
 import cv2, sys, os, time
-import fingerprint_enhancer as fe
 from fingerflow.extractor import Extractor
 
 
@@ -14,17 +13,14 @@ extractor = Extractor(COARSENET_PATH, FINENET_PATH, CLASSIFYNET_PATH, CORENET_PA
 def extract(file_name, show=True):
 
     image = cv2.imread(file_name)
-
     extracted_minutiae = extractor.extract_minutiae(image)
-    image = fe.enhance_Fingerprint(image)
-    image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
     if show:
         for _, row in extracted_minutiae['minutiae'].iterrows():
             image = cv2.circle(image, (int(row['x']), int(row['y'])), 5, (255,0,0), 2)
         print(extracted_minutiae['minutiae'])
         cv2.imshow('minutiae', image)
-        cv2.waitKey(0)
+        cv2.waitKey(1)
 
     return (extracted_minutiae['minutiae'], image)
 

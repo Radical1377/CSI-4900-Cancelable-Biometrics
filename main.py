@@ -1,15 +1,15 @@
-import os, cv2, sys, copy, random
-import minutiae_extractor
+import os, cv2, sys, copy, random, json
 import numpy as np
 import scipy.stats as stats
 from math import *
 from numpy import fft, linalg
-from helper import *
 from PIL import Image, ImageDraw
 from delaunay_triangulation.triangulate import delaunay
 from delaunay_triangulation.typing import Vertex
 
 R = 300 # Max Radial Distance
+
+SHOW_PIC = True
 
 # PCB Feature Set Params
 PCB_STEP_RHO = 5 # RANGE 5 to 20
@@ -30,7 +30,7 @@ PROJ_MAT_SEED = 1337 # Must be 32-bit integer
 PROJ_MAT_Y_DIM = 50 # Must be between 1-LC
 
 # Delaunay Code Permutation Params
-PERM_PHI = 200
+PERM_PHI = 1
 
 # Final Score Params
 FINAL_RHO = 0.7
@@ -142,7 +142,7 @@ def DTBFeatureCode(triangle):
 
 # Function for permuting the Delaunay Feature code
 def PermDelFeatCode(code):
-    LD = pow(2, np.shape(code)[0] * np.shape(code)[1])
+    LD = pow(2, 20)
 
     FQ = []
     for q in code:
@@ -160,7 +160,7 @@ def PermDelFeatCode(code):
         for j in i:
             FIT.append(j)
     FIT = int("".join(str(x) for x in FIT), 2)
-    return ((FC + FIT) % LD)
+    return (FC + FIT)
 
 def GenerateDCap(code_arr):
     O_LEN = floor(log2(360/DTB_STEP_O)) + 1
@@ -276,81 +276,68 @@ def FinalScore(CT,DT,CQ,DQ):
 
 if __name__ == "__main__":
 
-    # Detect and Extract Minutiae of Template image
-    print("Template Fingerprint:")
-    minutiae_dataframe, minutiae_image = minutiae_extractor.extract(str(sys.argv[1]), False)
+    # if directory is given as argument
+    if os.path.isdir(sys.argv[1]):
 
-    # Extract Minutiae Coordinates and Orientations
+        import minutiae_extractor
 
-    minutiae_points = []
-    for _, row in minutiae_dataframe.iterrows():
-        minutiae_points.append(Vertex(int(row['x']), int(row['y']), np.rad2deg(row['angle']), int(row['class'])))
+        files = os.listdir(sys.argv[1])
+        json_output = {
+            "DIRECTORY": sys.argv[1],
+            "FILES": files
+        }
 
-    # Generate Delaunay Triangles
-    triangulation = delaunay(minutiae_points)
+        for file in files:
 
-    # Draw Triangles
-    """
-    for trig in triangulation:
-        minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,255,0), 1)
-        minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
-        minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
-    cv2.imshow('final_output', minutiae_image)
-    cv2.waitKey(0)
-    """
-    # Template Polar
-    CT = []
-    for i in range(len(minutiae_points)):
-        tmp = PCBFeatureCode(minutiae_points, minutiae_points[i])
-        tmp = EnFeatDecAlg(tmp)
-        tmp = ProjectVect(tmp)
-        CT.append(tmp)
+            # Detect and Extract Minutiae of Template image
+            print("Processing: ", file)
+            minutiae_dataframe, minutiae_image = minutiae_extractor.extract(str(sys.argv[1]) + file, SHOW_PIC)
 
-    # Template Delaunay
-    DT = []
-    for i in range(len(triangulation)):
-        tmp = DTBFeatureCode(triangulation[i])
-        tmp = PermDelFeatCode(tmp)
-        DT.append(tmp)
-    DT = GenerateDCap(DT)
+            # Extract Minutiae Coordinates and Orientations
 
-    # Detect and Extract Minutiae of Query image
-    print("Query Fingerprint:")
-    minutiae_dataframe, minutiae_image = minutiae_extractor.extract(str(sys.argv[2]), False)
+            minutiae_points = []
+            for _, row in minutiae_dataframe.iterrows():
+                minutiae_points.append(Vertex(int(row['x']), int(row['y']), np.rad2deg(row['angle']), int(row['class'])))
 
-    # Extract Minutiae Coordinates and Orientations
+            # Generate Delaunay Triangles
+            triangulation = delaunay(minutiae_points)
 
-    minutiae_points = []
-    for _, row in minutiae_dataframe.iterrows():
-        minutiae_points.append(Vertex(int(row['x']), int(row['y']), np.rad2deg(row['angle']), int(row['class'])))
+            # Draw Triangles
+            if SHOW_PIC:
+                for trig in triangulation:
+                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,255,0), 1)
+                    minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
+                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
+                cv2.imshow('final_output', minutiae_image)
+                cv2.waitKey(1)
 
-    # Generate Delaunay Triangles
-    triangulation = delaunay(minutiae_points)
+            # Polar Coordinate Template
+            CT = []
+            for i in range(len(minutiae_points)):
+                tmp = PCBFeatureCode(minutiae_points, minutiae_points[i])
+                tmp = EnFeatDecAlg(tmp)
+                tmp = ProjectVect(tmp)
+                CT.append(tmp)
 
-    # Draw Triangles
-    """
-    for trig in triangulation:
-        minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,255,0), 1)
-        minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
-        minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
-    cv2.imshow('final_output', minutiae_image)
-    cv2.waitKey(0)
-    """
-    # Query Polar
-    CQ = []
-    for i in range(len(minutiae_points)):
-        tmp = PCBFeatureCode(minutiae_points, minutiae_points[i])
-        tmp = EnFeatDecAlg(tmp)
-        tmp = ProjectVect(tmp)
-        CQ.append(tmp)
+            # Delaunay Triangle Template
+            DT = []
+            for i in range(len(triangulation)):
+                tmp = DTBFeatureCode(triangulation[i])
+                tmp = PermDelFeatCode(tmp)
+                DT.append(tmp)
+            DT = GenerateDCap(DT)
 
-    # Query Delaunay
-    DQ = []
-    for i in range(len(triangulation)):
-        tmp = DTBFeatureCode(triangulation[i])
-        tmp = PermDelFeatCode(tmp)
-        DQ.append(tmp)
-    DQ = GenerateDCap(DQ)
+            json_output[file] = {"CT": str(CT), "DT": str(DT)}
 
-    # Calculate Final Score
-    FinalScore(CT,DT,CQ,DQ)
+        with open("test.json", "w") as outfile:
+            outfile.write(json.dumps(json_output, indent=4))
+
+    # if JSON file is given as argument
+    elif os.path.isfile(sys.argv[1]) and str(sys.argv[1])[-5:] == '.json':
+
+        # Load JSON
+        print("Loading JSON...")
+        with open(sys.argv[1], "r") as json_file:
+            fingerprints = json.load(json_file)
+
+        
