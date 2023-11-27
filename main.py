@@ -1,10 +1,11 @@
-import os, cv2, sys, copy, random, json
+import os, cv2, sys, copy, random, json, time
 import numpy as np
 import scipy.stats as stats
 from math import *
 from numpy import fft, linalg
 from matplotlib import pyplot as plt
 from PIL import Image, ImageDraw
+from numba import njit, jit, cuda
 from delaunay_triangulation.triangulate import delaunay
 from delaunay_triangulation.typing import Vertex
 
@@ -221,31 +222,27 @@ def EnFeatDecAlg(code):
     return result_code
 
 # Function for Projecting the feature code
+@jit(target_backend='cuda')
 def ProjectVect(vector):
 
     # Generating Projection Matrix M
-    M = []
-    random.seed(PROJ_MAT_SEED)
-    for i in range(PROJ_MAT_Y_DIM):
-        tmp = []
-        for j in range(LC):
-            tmp.append(random.random())
-        M.append(tmp)
+
+    np.random.seed(PROJ_MAT_SEED)
+    M = np.random.rand(PROJ_MAT_Y_DIM, LC)
 
     # Vector transformation
     V = np.array(vector)
-    M = np.array(M)
-    result_vector = list(np.matmul(M, V))
+    result_vector = list(np.dot(M, V))
 
     return result_vector
 
 # Matlab's corr2 function
+
+
 def corr2(a,b):
-    def mean2(x):
-        y = np.sum(x) / np.size(x)
-        return y
-    a = a - mean2(a)
-    b = b - mean2(b)
+
+    a = a - (np.sum(a) / pow(2,20))
+    b = b - (np.sum(b) / pow(2,20))
     r = (a*b).sum() / sqrt((a*a).sum() * (b*b).sum())
     return r
 
@@ -316,38 +313,62 @@ if __name__ == "__main__":
             # Polar Coordinate Template
             CT = []
             for i in range(len(minutiae_points)):
+
+                start = time.time()
                 tmp = PCBFeatureCode(minutiae_points, minutiae_points[i])
+                end = time.time()
+                print("PCBFeatureCode Execution time:", end-start)
+
+                start = time.time()
                 tmp = EnFeatDecAlg(tmp)
+                end = time.time()
+                print("EnFeatDecAlg Execution time:", end-start)
+
+                start = time.time()
                 tmp = ProjectVect(tmp)
+                end = time.time()
+                print("ProjectVect Execution time:", end-start)
+
                 CT.append(tmp)
 
             # Delaunay Triangle Template
             DT = []
             for i in range(len(triangulation)):
+
+                start = time.time()
                 tmp = DTBFeatureCode(triangulation[i])
+                end = time.time()
+                print("DTBFeatureCode Execution time:", end-start)
+
+                start = time.time()
                 tmp = PermDelFeatCode(tmp)
+                end = time.time()
+                print("PermDelFeatCode Execution time:", end-start)
+
                 DT.append(tmp)
+
+            start = time.time()
             DT = GenerateDCap(DT)
+            end = time.time()
+            print("GenerateDCap Execution time:", end-start)
 
-            json_output[file] = {"CT": str(CT), "DT": str(DT)}
+            json_output[file] = {"CT": CT, "DT": DT}
 
-        with open("test.json", "w") as outfile:
-            outfile.write(json.dumps(json_output, indent=4))
+        with open("test.npy", "wb") as outfile:
+            np.save(outfile, np.array([json_output]))
 
     # if JSON file is given as argument
-    elif os.path.isfile(sys.argv[1]) and str(sys.argv[1])[-5:] == '.json':
-
-
+    elif os.path.isfile(sys.argv[1]) and str(sys.argv[1])[-4:] == '.npy':
 
         # Load JSON
-        print("Loading JSON...")
-        with open(sys.argv[1], "r") as json_file:
-            fingerprints = json.load(json_file)
+        print("Loading NPY...")
+        fingerprints = np.load(sys.argv[1], allow_pickle=True)[0]
 
-        files = fingerprints["FILES"]
-        #for file in fingerprints["FILES"]:
-        #    if ("_1" in file) or ("_2" in file):
-        #        files.append(file)
+
+        files = []
+        for file in fingerprints["FILES"]:
+            if ("_1" in file) or ("_2" in file):
+                files.append(file)
 
 
         """
@@ -360,9 +381,19 @@ if __name__ == "__main__":
             for j in range(i+1, len(files)):
                 data = [files[i], files[j]]
                 print(files[i], ' vs ', files[j])
-                SC_MAX = calcSCMAX(eval(fingerprints[files[i]]["CT"]), eval(fingerprints[files[j]]["CT"]))
+
+                start = time.time()
+                SC_MAX = calcSCMAX(fingerprints[files[i]]["CT"], fingerprints[files[j]]["CT"])
+                end = time.time()
+                print("calcSCMAX Execution time:", end-start)
+
                 data.append(SC_MAX)
-                SD = calcSD(eval(fingerprints[files[i]]["DT"]), eval(fingerprints[files[j]]["DT"]))
+
+                start = time.time()
+                SD = calcSD(fingerprints[files[i]]["DT"], fingerprints[files[j]]["DT"])
+                end = time.time()
+                print("calcSD Execution time:", end-start)
+
                 data.append(SD)
                 processed_data.append(data)
 
