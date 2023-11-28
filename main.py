@@ -13,6 +13,9 @@ R = 300 # Max Radial Distance
 
 SHOW_PIC = False
 
+# Minutiae Score threshold
+MIN_SCORE_THRESH = 0.7
+
 # PCB Feature Set Params
 PCB_STEP_RHO = 5 # RANGE 5 to 20
 PCB_STEP_ALPHA = 15 # RANGE 15 to 40 Degrees
@@ -296,7 +299,8 @@ if __name__ == "__main__":
 
             minutiae_points = []
             for _, row in minutiae_dataframe.iterrows():
-                minutiae_points.append(Vertex(int(row['x']), int(row['y']), np.rad2deg(row['angle']), int(row['class'])))
+                if float(row['score']) > MIN_SCORE_THRESH:
+                    minutiae_points.append(Vertex(int(row['x']), int(row['y']), np.rad2deg(row['angle']), int(row['class'])))
 
             # Generate Delaunay Triangles
             triangulation = delaunay(minutiae_points)
@@ -364,12 +368,13 @@ if __name__ == "__main__":
         print("Loading NPY...")
         fingerprints = np.load(sys.argv[1], allow_pickle=True)[0]
 
-
+        files = fingerprints["FILES"]
+        """
         files = []
         for file in fingerprints["FILES"]:
             if ("_1" in file) or ("_2" in file):
                 files.append(file)
-
+        """
 
         """
             Processed Data row format: [file1, file2, raw/norm sc_max, raw/norm sd, final_score]
@@ -410,7 +415,7 @@ if __name__ == "__main__":
             row.append(FinalScore(row[2], row[3]))
 
         # Calculating FRR and FAR
-        threshold_step = 0.0001
+        threshold_step = 0.001
         FAR = []
         FRR = []
 
@@ -437,8 +442,10 @@ if __name__ == "__main__":
             FRR.append(rejected_genuine / total_genuine)
 
         # Plotting FAR and FRR based on threshold
-        print("FAR: ", FAR)
-        print("FRR: ", FRR)
         plt.plot(list(np.arange(0.0, 1.0, threshold_step)),FRR,
                 list(np.arange(0.0, 1.0, threshold_step)), FAR)
+        plt.show()
+
+        # ROC Curve
+        plt.plot(FAR, FRR)
         plt.show()

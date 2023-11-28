@@ -29,7 +29,3 @@ if __name__ == "__main__":
     extract(str(sys.argv[1]), show = True)
     end = time.time()
     print("Execution time:", end-start)
-    start = time.time()
-    extract(str(sys.argv[2]), show = True)
-    end = time.time()
-    print("Execution time:", end-start)
