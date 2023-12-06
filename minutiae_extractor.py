@@ -20,7 +20,7 @@ def extract(file_name, show=True):
             image = cv2.circle(image, (int(row['x']), int(row['y'])), 5, (255,0,0), 2)
         print(extracted_minutiae['minutiae'])
         cv2.imshow('minutiae', image)
-        cv2.waitKey(1)
+        cv2.waitKey(0)
 
     return (extracted_minutiae['minutiae'], image)
 

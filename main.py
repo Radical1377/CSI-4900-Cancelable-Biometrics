@@ -95,6 +95,7 @@ def PCBFeatureCode(minutiae_points, m0):
 # Function for calculating the Delaunay Feature Code
 def DTBFeatureCode(triangle):
 
+
     # Quantization bitstring lengths
     O_LEN = floor(log2(360/DTB_STEP_O)) + 1
     A_LEN = floor(log2(360/DTB_STEP_ALPHA)) + 1
@@ -102,13 +103,57 @@ def DTBFeatureCode(triangle):
     T_LEN = 3
 
     # Edge Lengths
-    m1m2 = sqrt(pow(triangle[0][0]-triangle[1][0], 2)
-              + pow(triangle[0][1]-triangle[1][1], 2))
-    m2m3 = sqrt(pow(triangle[1][0]-triangle[2][0], 2)
-              + pow(triangle[1][1]-triangle[2][1], 2))
-    m1m3 = sqrt(pow(triangle[0][0]-triangle[2][0], 2)
-              + pow(triangle[0][1]-triangle[2][1], 2))
+    edge_len = [[{0,1}, 0], [{1,2}, 0], [{0,2}, 0]]
+    #[0,1]
+    edge_len[0][1] = sqrt(pow(triangle[0][0]-triangle[1][0], 2) + pow(triangle[0][1]-triangle[1][1], 2))
+    #[1,2]
+    edge_len[1][1] = sqrt(pow(triangle[1][0]-triangle[2][0], 2) + pow(triangle[1][1]-triangle[2][1], 2))
+    #[0,2]
+    edge_len[2][1] = sqrt(pow(triangle[0][0]-triangle[2][0], 2) + pow(triangle[0][1]-triangle[2][1], 2))
 
+    print("EDGE LEN: ", edge_len)
+
+    # Calculating all angles and finding the largest one
+    vert_ang = [[0,0], [1,0], [2,0]]
+    # 0
+    vert_ang[0][1] = degrees(acos((pow(edge_len[0][1],2) + pow(edge_len[2][1],2) - pow(edge_len[1][1],2)) / (2 * edge_len[0][1] * edge_len[2][1])))
+    # 1
+    vert_ang[1][1] = degrees(acos((pow(edge_len[0][1],2) + pow(edge_len[1][1],2) - pow(edge_len[2][1],2)) / (2 * edge_len[0][1] * edge_len[1][1])))
+    # 2
+    vert_ang[2][1] = degrees(acos((pow(edge_len[1][1],2) + pow(edge_len[2][1],2) - pow(edge_len[0][1],2)) / (2 * edge_len[1][1] * edge_len[2][1])))
+
+    print("VERT ANG: ", vert_ang)
+
+    tmp = 0
+    for ang in vert_ang:
+        if ang[1] >= tmp:
+            max_ang = ang
+            tmp = ang[1]
+
+    A = max_ang[1]
+    print("MAX ANG: ", max_ang)
+
+    # Setting up L1 and L2
+    selected_edges = []
+    for edge in edge_len:
+        if max_ang[0] in edge[0]:
+            selected_edges.append(edge)
+    print("SEL EDGES: ", selected_edges)
+
+    if selected_edges[0][1] >= selected_edges[1][1]:
+        big_len = selected_edges[0]
+        sma_len = selected_edges[1]
+    else:
+        big_len = selected_edges[1]
+        sma_len = selected_edges[0]
+
+    L1 = big_len[1]
+    L2 = sma_len[1]
+
+    print("BIG LEN: ", big_len)
+    print("SMA LEN: ", sma_len)
+
+    """
     # Calculating O_CODE
     O = abs(triangle[1][2] - triangle[2][2])
     O = bin(floor(O / DTB_STEP_O))[2:]
@@ -116,9 +161,9 @@ def DTBFeatureCode(triangle):
     O_CODE = []
     for i in O:
         O_CODE.append(int(i))
+    """
 
     # Calculating A_CODE
-    A = degrees(acos((pow(m1m3,2) + pow(m1m2,2) - pow(m2m3,2)) / (2 * m1m3 * m1m2)))
     A = bin(floor(A / DTB_STEP_ALPHA))[2:]
     A = ('0' * (A_LEN - len(A) - 1)) + A
     A_CODE = []
@@ -126,23 +171,34 @@ def DTBFeatureCode(triangle):
         A_CODE.append(int(i))
 
     # Calculating L1_CODE
-    L = m1m2
-    L = bin(floor(L / DTB_STEP_L))[2:]
-    L = ('0' * (L_LEN - len(L) - 1)) + L
+    L1 = bin(floor(L1 / DTB_STEP_L))[2:]
+    L1 = ('0' * (L_LEN - len(L1) - 1)) + L1
     L1_CODE = []
-    for i in L:
+    for i in L1:
         L1_CODE.append(int(i))
 
     # Calculating L2_CODE
-    L = m1m3
-    L = bin(floor(L / DTB_STEP_L))[2:]
-    L = ('0' * (L_LEN - len(L) - 1)) + L
+    L2 = bin(floor(L2 / DTB_STEP_L))[2:]
+    L2 = ('0' * (L_LEN - len(L2) - 1)) + L2
     L2_CODE = []
-    for i in L:
+    for i in L2:
         L2_CODE.append(int(i))
 
+    # Calculating T_CODE
+    big_ind = big_len[0]
+    big_ind.remove(max_ang[0])
+    big_ind = big_ind.pop()
+
+    sma_ind = sma_len[0]
+    sma_ind.remove(max_ang[0])
+    sma_ind = sma_ind.pop()
+
+    T_CODE = [int(triangle[big_ind][3] == 0),
+              int(triangle[max_ang[0]][3] == 0),
+              int(triangle[sma_ind][3] == 0)]
+
     # Concatenate all CODE binary arrays to generate the feature code
-    feature_code = [O_CODE, L1_CODE, L2_CODE, A_CODE]
+    feature_code = [A_CODE, L1_CODE, L2_CODE, T_CODE]
     return feature_code
 
 # Function for permuting the Delaunay Feature code
@@ -308,11 +364,11 @@ if __name__ == "__main__":
             # Draw Triangles
             if SHOW_PIC:
                 for trig in triangulation:
-                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,255,0), 1)
-                    minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
-                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,255,0), 1)
+                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,0,255), 3)
+                    minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,0,255), 3)
+                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,0,255), 3)
                 cv2.imshow('final_output', minutiae_image)
-                cv2.waitKey(1)
+                cv2.waitKey(0)
 
             # Polar Coordinate Template
             CT = []
