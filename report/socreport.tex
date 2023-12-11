@@ -1,0 +1,91 @@
+\documentclass[fyp]{socreport}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\begin{document}
+\pagenumbering{roman}
+\title{Cancelable Biometrics: Analysis and Implementation of a Fingerprint Template Transformation Method}
+\author{Arman Kompany Zare}
+\projyear{Fall 2023}
+\advisor{Dr. Carlisle Adams}
+\maketitle
+\begin{abstract}
+In this report, we analyze, implement, and verify a specific cancelable biometric method from a 2018 research paper \cite{wencheng18cbio}, which is used for transforming fingerprint templates. Our implementation of this method has been solely developed on Python over the course of three months with the help of some open source python libraries. The implementation closely follows the given algorithms on the paper and bears certain advantages in comparison such as improved runtime performance using GPU utilization (powered by NVIDIA CUDA), and all tools involved being fully open source and free to use. The verification of the paper's results was done by running the implementation on the same FVC fingerprint datasets used on the paper and other datasets, using the same parameter configurations as indicated in their different test cases. Similar outcomes to those on the paper were achieved as a result, which further proved the security and accuracy of this method for fingerprint matching.
+
+\begin{keywords}
+	Fingerprint, Cancelable Biometrics
+\end{keywords}
+\begin{implement}
+	Python 3, Anaconda, Numba, TensorFlow, NVIDIA CUDA 
+\end{implement}
+\end{abstract}
+
+\begin{acknowledgement}
+   First and foremost, I would like to thank Professor Carlisle Adams for suggesting this particular research subject, and his continued support and supervision on it. I also appreciate Professor Wencheng Yang, and the other authors of the 2018 paper, for responding to my inquiries regarding their work with helpful explanations and answers. Full credits and acknowledgement goes to the developers and maintainers of the Python libraries used within this project.
+\end{acknowledgement}
+
+\listoffigures
+\listoftables
+\tableofcontents 
+
+\chapter{Introduction}
+In today's world, biometrics play a greater role than ever in preserving our digital security and privacy.  Some of the reasons that most people and organizations choose biometrics over static or variable string-based passwords are: Uniqueness, Convenience, and Complexity.
+
+The Uniqueness advantage comes from the fact that when it comes to biometrics, especially fingerprints, almost no two individuals possess the same biometric information. So there are no overlaps in case of comparisons. On the other hand, there is a slim chance that two people in the world would coincidentally share the same static password for their applications or accounts, which would lead to security issues if one of their passwords gets compromised.
+
+Regarding Convenience, it is obvious that biometric information do not necessarily need to be remembered by a person, and are perfectly portable since they are literal parts of that person's own body. On the other hand, complex passwords may be difficult to remember and misinputs could occur while entering them in. Even sometimes, said complex passwords or hashes are so large in data size that they need to be carried around by flash or external drives.
+
+Naturally, the data complexity of a single fingerprint or piece of biometric data surpasses the complexity of an average static password by a great margin. As it will be discussed further later in this report, approximately 2.5 MBs worth of data is required for representing a single encoded fingerprint template, while an average person's static password (32 characters) is represented by a mere 1 KB of data. In first glance, there may be a space cost disadvantage, but in return the exponentially increased complexity will make it near impossible to reconstruct biometric data through exhaustive search.
+\begin{figure}
+	
+	\centering
+		\includegraphics[width=0.25\textwidth]{logo}
+	\caption{A picture of a gull.}
+\end{figure}
+\section{Background}
+In this section, we briefly discuss the history and background
+of the problem.  A detail literature survey is presented in 
+Chapter \ref{ch:related}.
+
+The problem we study in this report is an important one.
+This problem is first proposed in 1990 in the context
+of graph theory \cite{kumar19cbio}.  Zhang gives the
+first algorithm to the problem and applied it to solve several 
+problems in artificial intelligence   
+More recently, a slightly different formulation of the problem
+is studied independently \cite{maltoni22fing}.  None of this previous work
+uses the technique that we propose in this project.  Thus, we 
+believe that our algorithm is novel.
+
+\section{The Problem}
+In this section, we formally defined the problem.  We adopt
+the definition given by Kovsky 
+
+\section{Our Solution}
+\section{Report Organization}
+
+\chapter{Related Work}
+\label{ch:related}
+
+\chapter{Problem and Algorithm}
+\section{Formal Description of Problem}
+\section{Design of Algorithm}
+\section{Proof of Correctness}
+\section{Complexity Analysis}
+
+\chapter{Evaluation}
+\section{Implementation Details}
+\section{Experimental Setup}
+\section{Results}
+
+\chapter{Conclusion}
+\section{Contributions}
+\section{Future Work}
+
+\bibliographystyle{socreport}
+\bibliography{socreport}
+
+\appendix
+\chapter{Code}
+
+\end{document}

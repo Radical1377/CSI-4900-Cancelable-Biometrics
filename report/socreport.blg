@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2021/CVE-2023-32700 patched)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: socreport.aux
+The style file: socreport.bst
+Database file #1: socreport.bib
+Warning--empty address in maltoni22fing
+You've used 3 entries,
+            2653 wiz_defined-function locations,
+            580 strings with 4836 characters,
+and the built_in function-call counts, 1466 in all, are:
+= -- 133
+> -- 85
+< -- 1
++ -- 33
+- -- 33
+* -- 139
+:= -- 275
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 25
+chr.to.int$ -- 3
+cite$ -- 7
+duplicate$ -- 41
+empty$ -- 85
+format.name$ -- 35
+if$ -- 267
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 4
+newline$ -- 18
+num.names$ -- 20
+pop$ -- 29
+preamble$ -- 1
+purify$ -- 25
+quote$ -- 0
+skip$ -- 38
+stack$ -- 0
+substring$ -- 64
+swap$ -- 5
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 24
+warning$ -- 1
+while$ -- 13
+width$ -- 0
+write$ -- 49
+(There was 1 warning)

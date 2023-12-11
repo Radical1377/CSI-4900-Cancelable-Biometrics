@@ -1,0 +1,24 @@
+\contentsline {chapter}{Abstract}{ii}{}%
+\contentsline {chapter}{Acknowledgement}{iii}{}%
+\contentsline {chapter}{List of Figures}{iv}{}%
+\contentsline {chapter}{List of Tables}{v}{}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{}%
+\contentsline {section}{\numberline {1.1}Background}{2}{}%
+\contentsline {section}{\numberline {1.2}The Problem}{2}{}%
+\contentsline {section}{\numberline {1.3}Our Solution}{2}{}%
+\contentsline {section}{\numberline {1.4}Report Organization}{2}{}%
+\contentsline {chapter}{\numberline {2}Related Work}{3}{}%
+\contentsline {chapter}{\numberline {3}Problem and Algorithm}{4}{}%
+\contentsline {section}{\numberline {3.1}Formal Description of Problem}{4}{}%
+\contentsline {section}{\numberline {3.2}Design of Algorithm}{4}{}%
+\contentsline {section}{\numberline {3.3}Proof of Correctness}{4}{}%
+\contentsline {section}{\numberline {3.4}Complexity Analysis}{4}{}%
+\contentsline {chapter}{\numberline {4}Evaluation}{5}{}%
+\contentsline {section}{\numberline {4.1}Implementation Details}{5}{}%
+\contentsline {section}{\numberline {4.2}Experimental Setup}{5}{}%
+\contentsline {section}{\numberline {4.3}Results}{5}{}%
+\contentsline {chapter}{\numberline {5}Conclusion}{6}{}%
+\contentsline {section}{\numberline {5.1}Contributions}{6}{}%
+\contentsline {section}{\numberline {5.2}Future Work}{6}{}%
+\contentsline {chapter}{References}{7}{}%
+\contentsline {chapter}{\numberline {A}Code}{A-1}{}%
