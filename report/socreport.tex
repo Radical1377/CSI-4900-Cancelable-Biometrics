@@ -16,7 +16,7 @@ In this report, we analyze, implement, and verify a specific cancelable biometri
 	Fingerprint, Cancelable Biometrics
 \end{keywords}
 \begin{implement}
-	Python 3, Anaconda, Numba, TensorFlow, NVIDIA CUDA 
+	Python 3, Anaconda, Numba, TensorFlow, Nvidia CUDA 
 \end{implement}
 \end{abstract}
 
@@ -24,44 +24,39 @@ In this report, we analyze, implement, and verify a specific cancelable biometri
    First and foremost, I would like to thank Professor Carlisle Adams for suggesting this particular research subject, and his continued support and supervision on it. I also appreciate Professor Wencheng Yang, and the other authors of the 2018 paper, for responding to my inquiries regarding their work with helpful explanations and answers. Full credits and acknowledgement goes to the developers and maintainers of the Python libraries used within this project.
 \end{acknowledgement}
 
+
+\tableofcontents 
 \listoffigures
 \listoftables
-\tableofcontents 
 
 \chapter{Introduction}
-In today's world, biometrics play a greater role than ever in preserving our digital security and privacy.  Some of the reasons that most people and organizations choose biometrics over static or variable string-based passwords are: Uniqueness, Convenience, and Complexity.
-
+In today's world, biometrics play a greater role than ever in preserving our digital security and privacy.  Some of the reasons that most people and organizations choose biometrics over static or variable string-based passwords are: Uniqueness, Convenience, and Complexity. However, there is one specific weakness involved with biometric methods, which will be discussed further ahead (under Section 1.2). There exist numerous methods for resolving this weakness which generally fall under the term: Cancelable Biometrics. In this report a specific method \cite{wencheng18cbio} which is used for fingerprint biometric data, will be discussed and analyzed, along with a documentation on its implementation, yielded results and performance comparison.
+\section{Advantages of Biometric Data}
 The Uniqueness advantage comes from the fact that when it comes to biometrics, especially fingerprints, almost no two individuals possess the same biometric information. So there are no overlaps in case of comparisons. On the other hand, there is a slim chance that two people in the world would coincidentally share the same static password for their applications or accounts, which would lead to security issues if one of their passwords gets compromised.
 
 Regarding Convenience, it is obvious that biometric information do not necessarily need to be remembered by a person, and are perfectly portable since they are literal parts of that person's own body. On the other hand, complex passwords may be difficult to remember and misinputs could occur while entering them in. Even sometimes, said complex passwords or hashes are so large in data size that they need to be carried around by flash or external drives.
 
-Naturally, the data complexity of a single fingerprint or piece of biometric data surpasses the complexity of an average static password by a great margin. As it will be discussed further later in this report, approximately 2.5 MBs worth of data is required for representing a single encoded fingerprint template, while an average person's static password (32 characters) is represented by a mere 1 KB of data. In first glance, there may be a space cost disadvantage, but in return the exponentially increased complexity will make it near impossible to reconstruct biometric data through exhaustive search.
-\begin{figure}
-	
-	\centering
-		\includegraphics[width=0.25\textwidth]{logo}
-	\caption{A picture of a gull.}
-\end{figure}
-\section{Background}
-In this section, we briefly discuss the history and background
-of the problem.  A detail literature survey is presented in 
-Chapter \ref{ch:related}.
+Naturally, the data complexity of a single fingerprint or piece of biometric data surpasses the complexity of an average static password by a great margin. As it will be discussed further later in this report, approximately 2.5 Megabytes worth of data is required for representing a single encoded fingerprint template. Meanwhile an average static password (32 characters) is represented by a mere 32 Bytes of data. At first glance, there may be a space cost disadvantage, but in return the exponentially increased complexity will make it near impossible to reconstruct biometric data through exhaustive search.
 
-The problem we study in this report is an important one.
-This problem is first proposed in 1990 in the context
-of graph theory \cite{kumar19cbio}.  Zhang gives the
-first algorithm to the problem and applied it to solve several 
-problems in artificial intelligence   
-More recently, a slightly different formulation of the problem
-is studied independently \cite{maltoni22fing}.  None of this previous work
-uses the technique that we propose in this project.  Thus, we 
-believe that our algorithm is novel.
+\section{The Problem: Irrevocability}
+In spite of the advantages mentioned above, static passwords hold at least one important advantage over biometric data, and that is their revocability. In case of a credential leak, the exposed user can easily revoke their password and have it replaced by a new one, and as a result, the leaked password will hold no leverage in future compromises on the same user.
 
-\section{The Problem}
-In this section, we formally defined the problem.  We adopt
-the definition given by Kovsky 
+On the other hand, if biometric data, such as a fingerprint get compromised, it will be forever exposed and there will be no way to have it revoked and replaced like a static password. Additionally, the risk for the biometric data to be used in future attacks will remain indefinitely.
 
-\section{Our Solution}
+\section{The Solution: Cancelable Biometrics}
+Fortunately for us, there are a plethora of methods which cover the irrevocability weakness. These solutions fall under the category of Cancelable Biometrics. In general, the method converts a fingerprint into a certain data structure referred to as a template, which represents the fingerprint's minutiae data with great accuracy. Then the method transforms the template using a public key into a transformed template. Afterwards, the transformed template and its respective public key are saved to a database. In case the database gets hacked into, the attacker wouldn't be able to retrieve the original template through the public key and the transformed template. In addition, the transformed template and its respective public key are revocable. Meaning that the exposed data could be easily removed from the database, and be replaced by a new public key from which another completely different transformed template could be generated.
+
+\subsection{Solution Outline}
+The process behind Cancelable Biometrics methods usually involves two generic stages: Enrolment and Verification. The following is a rough explanation of the whole process and its stages.
+
+\subsubsection{Enrolment}
+In the Enrolment stage, the Target fingerprint which is supposed to be used as reference for future comparisons gets scanned, and we get a grayscale picture of the fingerprint scan as a result. Next, we need to detect all the valid minutiae points on the fingerprint image, and create an Initial Fingerprint Template (IFT) using said minutiae. The IFT is composed of extracted minutiae data under a number of different schemes. From this point on, is where the most crucial process begins to occur. Using a set of algorithms designed for this specific Cancelable Biometric method, we will transform the IFT into an Transformed Fingerprint Template (TFT) using a psudeo-randomly generated Public Key. Finally, the TFT along with its respective Public Key which was used to generate it, will be stored in memory.
+
+\subsubsection{Verification}
+Afterwards, in the Verification stage, our Query fingerprint will be scanned and converted into another IFT using the same schemes and standards based on its minutiae data. Then using the same public key, the IFT will be transformed into a TFT. The Query fingerprint's TFT will then be compared with the Target fingerprint's TFT using a series of comparison methods. Ultimately, using a final score derived from the comparison methods and a predetermined score threshold, we will determine whether the two fingerprints match or not.
+
+\subsection{Solution Properties}
+Ofcourse, in order for both security and accuracy to be guaranteed, two main requisites must be met in the design a Cancelable Biometric method. One is the irreversibility of the process, in which the IFT gets transformed into the TFT. The other is the comparability of the Target fingerprint's TFT with the Query fingerprint's TFT.
 \section{Report Organization}
 
 \chapter{Related Work}
