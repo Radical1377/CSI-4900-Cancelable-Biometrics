@@ -10,8 +10,16 @@
 \contentsline {subsubsection}{Enrolment}{3}{}%
 \contentsline {subsubsection}{Verification}{3}{}%
 \contentsline {subsection}{\numberline {1.3.2}Solution Properties}{4}{}%
-\contentsline {section}{\numberline {1.4}Report Organization}{4}{}%
-\contentsline {chapter}{\numberline {2}Related Work}{5}{}%
+\contentsline {subsubsection}{Irreversibility}{4}{}%
+\contentsline {subsubsection}{Comparability}{4}{}%
+\contentsline {chapter}{\numberline {2}Other Related Works}{5}{}%
+\contentsline {section}{\numberline {2.1}Brief Outlines of Previous Strategies}{5}{}%
+\contentsline {subsection}{\numberline {2.1.1}Random Projections}{5}{}%
+\contentsline {section}{\numberline {2.2}The Yang Method}{5}{}%
+\contentsline {subsection}{\numberline {2.2.1}Outline}{5}{}%
+\contentsline {subsection}{\numberline {2.2.2}Advantages}{5}{}%
+\contentsline {subsubsection}{Reduced Non-Linear Distortion}{5}{}%
+\contentsline {subsubsection}{ARM Attack Invulnerability}{5}{}%
 \contentsline {chapter}{\numberline {3}Problem and Algorithm}{6}{}%
 \contentsline {section}{\numberline {3.1}Formal Description of Problem}{6}{}%
 \contentsline {section}{\numberline {3.2}Design of Algorithm}{6}{}%

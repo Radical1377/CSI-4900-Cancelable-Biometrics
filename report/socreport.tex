@@ -56,11 +56,33 @@ In the Enrolment stage, the Target fingerprint which is supposed to be used as r
 Afterwards, in the Verification stage, our Query fingerprint will be scanned and converted into another IFT using the same schemes and standards based on its minutiae data. Then using the same public key, the IFT will be transformed into a TFT. The Query fingerprint's TFT will then be compared with the Target fingerprint's TFT using a series of comparison methods. Ultimately, using a final score derived from the comparison methods and a predetermined score threshold, we will determine whether the two fingerprints match or not.
 
 \subsection{Solution Properties}
-Ofcourse, in order for both security and accuracy to be guaranteed, two main requisites must be met in the design a Cancelable Biometric method. One is the irreversibility of the process, in which the IFT gets transformed into the TFT. The other is the comparability of the Target fingerprint's TFT with the Query fingerprint's TFT.
-\section{Report Organization}
+Ofcourse, in order for both security and accuracy to be guaranteed, two main requisites must be met in the design a Cancelable Biometric method. One is the irreversibility of the process, in which the IFT gets transformed into the TFT. The other is the comparability of the Target fingerprint's TFT with the Query fingerprint's TFT, hence the differences in the Target and Query IFT must be somewhat preserved in their respective TFTs.
 
-\chapter{Related Work}
-\label{ch:related}
+\subsubsection{Irreversibility}
+In the case of an intrusion, the worst case scenario would be the compromise of the TFT and Public Key pair. In this case, the infiltrator should not be able to obtain the IFT from the TFT and Public Key by any means other than brute force. For a function to guarantee this attribute, it must preferably be a non-injective function (not one to one), and non-invertible. The input element of this function must be also large enough for exhaustive search to be near impossible. For instance a hash function such as SHA-512, is a good example of an irrevertible function. 
+
+\subsubsection{Comparability}
+An irrevertible function such as a hash function may seem to be a good candidate for our purpose at first glance. But when it comes to biometric input, the smallest differences in input data could result in very different and incomparable outputs after being put through something such as a hash function.
+
+Therefore we need a function or transformation that could preserve the small initial differences and render the results comparable. In Chapter 2, a few of these functions will be discussed.
+
+\chapter{Other Related Works}
+Before we get to the full analysis of the Yang method \cite{wencheng18cbio}, a number of other previously devised methods in the field of Cancelable Biometrics will be briefly covered from a review paper \cite{kumar19cbio}. After a brief discussion of other methods, certain advantages of the Yang method over previous methods will be examined.
+
+
+
+\section{Brief Outlines of Previous Strategies}
+\subsection{Random Projections}
+
+\section{The Yang Method}
+\subsection{Outline}
+
+
+\subsection{Advantages}
+The main contributions of the Yang method compared to the previously mentioned works, are the following advantages:
+
+\subsubsection{Reduced Non-Linear Distortion}
+\subsubsection{ARM Attack Invulnerability}
 
 \chapter{Problem and Algorithm}
 \section{Formal Description of Problem}
