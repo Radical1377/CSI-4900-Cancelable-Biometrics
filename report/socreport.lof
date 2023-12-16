@@ -1,5 +1,10 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Seven most common minutiae types}}{5}{}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces A list of detected minutiae points and their attributes}}{6}{}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces A set of points subjected to Delaunay Triangulation}}{7}{}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces A Voronoi diagram consisting of Voronoi cells and their respective points}}{7}{}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Minutiae points on a fingerprint and its Delaunay Triangulation}}{8}{}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

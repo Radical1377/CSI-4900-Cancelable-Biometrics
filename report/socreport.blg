@@ -3,46 +3,48 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: socreport.aux
 The style file: socreport.bst
 Database file #1: socreport.bib
+`month' is a missing field, not a string, for entry delaunay34trig
+while executing---line 1367 of file socreport.bst
 Warning--empty address in maltoni22fing
-You've used 3 entries,
+You've used 5 entries,
             2653 wiz_defined-function locations,
-            580 strings with 4836 characters,
-and the built_in function-call counts, 1466 in all, are:
-= -- 133
-> -- 85
-< -- 1
-+ -- 33
-- -- 33
-* -- 139
-:= -- 275
-add.period$ -- 9
-call.type$ -- 3
-change.case$ -- 25
-chr.to.int$ -- 3
-cite$ -- 7
-duplicate$ -- 41
-empty$ -- 85
-format.name$ -- 35
-if$ -- 267
+            593 strings with 5108 characters,
+and the built_in function-call counts, 2178 in all, are:
+= -- 213
+> -- 103
+< -- 3
++ -- 37
+- -- 37
+* -- 201
+:= -- 394
+add.period$ -- 15
+call.type$ -- 5
+change.case$ -- 37
+chr.to.int$ -- 5
+cite$ -- 11
+duplicate$ -- 65
+empty$ -- 135
+format.name$ -- 43
+if$ -- 410
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 4
-newline$ -- 18
-num.names$ -- 20
-pop$ -- 29
+missing$ -- 5
+newline$ -- 28
+num.names$ -- 30
+pop$ -- 39
 preamble$ -- 1
-purify$ -- 25
+purify$ -- 37
 quote$ -- 0
-skip$ -- 38
+skip$ -- 63
 stack$ -- 0
-substring$ -- 64
-swap$ -- 5
+substring$ -- 111
+swap$ -- 7
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 24
+type$ -- 42
 warning$ -- 1
-while$ -- 13
+while$ -- 19
 width$ -- 0
-write$ -- 49
-(There was 1 warning)
+write$ -- 80
+(There was 1 error message)

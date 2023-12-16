@@ -1,12 +1,17 @@
 import cv2, sys, os, time
 from fingerflow.extractor import Extractor
 
-
-COARSENET_PATH = os.getcwd() + '\\models\\CoarseNet.h5'
-FINENET_PATH = os.getcwd() + '\\models\\FineNet.h5'
-CLASSIFYNET_PATH = os.getcwd() + '\\models\\ClassifyNet_6_classes.h5'
-CORENET_PATH = os.getcwd() + '\\models\\CoreNet.weights'
-
+if os.name == 'nt':
+    COARSENET_PATH = os.getcwd() + '\\models\\CoarseNet.h5'
+    FINENET_PATH = os.getcwd() + '\\models\\FineNet.h5'
+    CLASSIFYNET_PATH = os.getcwd() + '\\models\\ClassifyNet_6_classes.h5'
+    CORENET_PATH = os.getcwd() + '\\models\\CoreNet.weights'
+else:
+    COARSENET_PATH = os.getcwd() + '/models/CoarseNet.h5'
+    FINENET_PATH = os.getcwd() + '/models/FineNet.h5'
+    CLASSIFYNET_PATH = os.getcwd() + '/models/ClassifyNet_6_classes.h5'
+    CORENET_PATH = os.getcwd() + '/models/CoreNet.weights'
+    
 extractor = Extractor(COARSENET_PATH, FINENET_PATH, CLASSIFYNET_PATH, CORENET_PATH)
 
 # Returns pandas DataFrame of all minutiaes
@@ -17,7 +22,10 @@ def extract(file_name, show=True):
 
     if show:
         for _, row in extracted_minutiae['minutiae'].iterrows():
-            image = cv2.circle(image, (int(row['x']), int(row['y'])), 5, (255,0,0), 2)
+            if row['class'] == 0:
+                image = cv2.circle(image, (int(row['x']), int(row['y'])), 5, (255,0,0), 2)
+            else:
+                image = cv2.circle(image, (int(row['x']), int(row['y'])), 5, (0,0,255), 2)
         print(extracted_minutiae['minutiae'])
         cv2.imshow('minutiae', image)
         cv2.waitKey(0)

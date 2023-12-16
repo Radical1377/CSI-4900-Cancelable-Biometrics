@@ -11,10 +11,10 @@ from delaunay_triangulation.typing import Vertex
 
 R = 300 # Max Radial Distance
 
-SHOW_PIC = False
+SHOW_PIC = True
 
 # Minutiae Score threshold
-MIN_SCORE_THRESH = 0.7
+MIN_SCORE_THRESH = 0.0
 
 # PCB Feature Set Params
 PCB_STEP_RHO = 5 # RANGE 5 to 20
@@ -364,9 +364,9 @@ if __name__ == "__main__":
             # Draw Triangles
             if SHOW_PIC:
                 for trig in triangulation:
-                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,0,255), 3)
-                    minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,0,255), 3)
-                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,0,255), 3)
+                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[1][0], trig[1][1]) , (0,255,0), 2)
+                    minutiae_image = cv2.line(minutiae_image, (trig[1][0], trig[1][1]), (trig[2][0], trig[2][1]) , (0,255,0), 2)
+                    minutiae_image = cv2.line(minutiae_image, (trig[0][0], trig[0][1]), (trig[2][0], trig[2][1]) , (0,255,0), 2)
                 cv2.imshow('final_output', minutiae_image)
                 cv2.waitKey(0)
 
