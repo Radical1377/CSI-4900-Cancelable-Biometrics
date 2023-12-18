@@ -1,12 +1,13 @@
 \documentclass[fyp]{socreport}
 \usepackage{fullpage}
 \usepackage{graphicx}
-\usepackage{amsmath}
+\usepackage{amsmath, amsfonts}
 \usepackage{float}
 \usepackage{listings}
 \usepackage{color}
 \graphicspath{ {./images/} }
 
+\newcommand\norm[1]{\lVert#1\rVert}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -82,6 +83,13 @@ In the Enrolment stage, the Target fingerprint which is supposed to be used as r
 \subsubsection{Verification}
 Afterwards, in the Verification stage, our Query fingerprint will be scanned and converted into another IFT using the same schemes and standards based on its minutiae data. Then using the same public key, the IFT will be transformed into a TFT. The Query fingerprint's TFT will then be compared with the Target fingerprint's TFT using a series of comparison methods. Ultimately, using a final score derived from the comparison methods and a predetermined score threshold, we will determine whether the two fingerprints match or not.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]
+	{General_Pipeline}
+	\caption{A simplified diagram of the Enrolment and Verification pipelines}
+\end{figure}
+
 \subsection{Solution Properties}
 Ofcourse, in order for both security and accuracy to be guaranteed, two main requisites must be met in the design a Cancelable Biometric method. One is the irreversibility of the process, in which the IFT gets transformed into the TFT. The other is the comparability of the Target fingerprint's TFT with the Query fingerprint's TFT, hence the differences in the Target and Query IFT must be somewhat preserved in their respective TFTs.
 
@@ -93,8 +101,8 @@ An irrevertible function such as a hash function may seem to be a good candidate
 
 Therefore we need a function or transformation that could preserve the small initial differences and render the results comparable. In Chapter 2, a few of these functions, which are relevant to the main algorithm of our study, will be discussed.
 
-\chapter{Preliminaries and Related Works}
-Before we get to the full analysis of the Yang method \cite{wencheng18cbio}, a number of basic definitions, and other previously devised methods in the field of Cancelable Biometrics will be briefly covered from a review paper \cite{kumar19cbio}. After a brief explanation of the Yang method and other methods, certain advantages of the Yang method over previously researched methods will be examined.
+\chapter{Preliminaries}
+Before we get to the full analysis of the Yang method \cite{wencheng18cbio}, a few basic definitions and concepts will be briefly covered. After a brief explanation of the Yang method, some of its exclusive advantages over other methods in Cancelable Biometrics will be listed. Moreover at the end, the irreversibility and comparability criterias of the IFT to TFT transformations will be demonstrated.
 
 
 \section{Concepts and Definitions}
@@ -170,6 +178,13 @@ The Delaunay IFT, is essentially an array of all Delaunay Triangles encoded and 
 
 After the two IFTs of the target fingerprint are obtained, we obtain the two IFTs of the query fingerprint using the same Public Key (same projection matrix and $\phi$). Then the similarity scores of the respective IFTs are calculated (\texttt{SC\_MAX} for the Polar IFTs, and \texttt{SD} for the Delaunay IFTs), normalized, and put into a Final Score formula for giving the finalized similarity score of the two fingerprints.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.1\textwidth]
+	{Specific_Pipeline}
+	\caption{Full Enrolment and Verification pipeline diagram of the Yang method}
+\end{figure}
+
 \subsection{Advantages}
 The main contributions of the Yang method compared to the previously mentioned works, involve the following advantages:
 
@@ -179,13 +194,98 @@ Since the Yang method's IFT and final result depend on a combination of the Pola
 For instance a cause of non-linear distortion would be to have a system which solely relies on the Polar Coordinate-based scheme for the generation of its IFT, which would result in the system not taking into account the minutiae that are located far away from the reference minutiae. That is because, in the Polar Coordinate-based scheme, only minutiae that are placed within a certain limited radius of the reference minutiae are taken into account and used to generate the IFT. Therefore, compared with the system that solely uses a Polar Coordinate-based scheme, higher recognition accuracy is achieved.
 
 \subsubsection{ARM Attack Invulnerability}
-The ARM attack, otherwise known as attack via record multiplicity, is an exploit which results from the compromise of several TFTs and their respective generative parameters (the Public Key in our case), and leads to the full or partial generation of the original IFT. A main reason that a lot of Cancelable Biometrics methods suffer from the ARM attack is due to feature correlation. To propagate this issue, a FDA is implemented within the method, so that in the process of the IFT to TFT transformation, the feature vectors within the IFT become uncorrelated in regards to another. Without any correlation between said features in the IFT, the attacker wouldn't have enough data to determine the original IFT.
+The ARM attack, otherwise known as Attack via Record Multiplicity, is an exploit which results from the compromise of several TFTs and their respective generative parameters (the Public Key in our case), and leads to the full or partial generation of the original IFT. A main reason that a lot of Cancelable Biometrics methods suffer from the ARM attack is due to feature correlation. To propagate this issue, a FDA is implemented within the method, so that in the process of the IFT to TFT transformation, the feature vectors within the IFT become uncorrelated in regards to another. Without any correlation between said features in the IFT, the attacker wouldn't have enough data to determine the original IFT.
 
 \subsection{Guarantee of Irreversibility}
+\subsubsection{Polar Coordinate-based Scheme}
+The irreversibility of the IFT to TFT transformation is guaranteed through the random projection $F$ performed on the IFT vectors. 
+
+\begin{center}
+	$F: \mathbb{C}^{n} \to \mathbb{C}^m$ where $n \ge m$: $F(x) = Ax$
+\end{center}
+
+In our case, the projection matrix $A$ is composed of pseudo-randomly generated entries based on a seed. According to basic linear algebra fundamentals, since the projection matrix $A$ is not a square matrix, it is therefore not invertible. Therefore it is not possible to derive $F^{-1}$ except through exhaustive search. Hence irreversibility is guaranteed due to the involvement of random projection within the IFT to TFT transformation within the Polar Coordinate-based scheme.
+
 \subsection{Guarantee of Comparability}
+\subsubsection{Polar Coordinate-based Scheme}
+The irreversibility of the IFT to TFT transformation is guaranteed, but what about its comparability? Will the characteristics of the IFT vectors in regards to each other be preserved after performing random projection on them? Fortunately, the answer is yes, thanks to the Johnson-Lindenstrauss (JL) Lemma \cite{lind84lem}:
+
+\begin{center}
+	Lemma: For any $0 \le \epsilon \leq 1$ and any integer $p$, let $n$ be a positive integer such that: $n \ge \frac{4 ln(p)}{\epsilon^2 / 2 - \epsilon^3 / 3}$.
+	
+	Then for any set $\mathbb{S}$ of $p = |\mathbb{S}|$ data points in $\mathbb{R}^N$, there is a map $f: \mathbb{R}^N \to \mathbb{R}^n (N \ge n)$, such that for all $x, y \in \mathbb{S}$:
+\begin{equation}
+	(1- \epsilon) \norm{x-y}^2 \leq \norm{f(x) - f(y)}^2 \leq (1+ \epsilon)\norm{x-y}^2
+\end{equation}
+
+\end{center}
+
+Overall, the JL lemma states that our IFT vectors in $\mathbb{R}^N$ vector space can be embedded into a lower dimension vector space $\mathbb{R}^n$, such that the difference between any two pair of vectors in the IFT will also be approximately maintained in between their respective pair in the TFT after the random projection is performed on the vectors.
+
+
 
 \chapter{Algorithm and Implementation}
+This chapter will include the full description of the Yang method and the generations of its IFTs and TFTs. In addition, we will go over the list of tools and frameworks utilized for our implmentation and the reason behind the selection of said tools. Finally, the whole development process and the challenges involved in it will be provided in a detailed manner.
+
 \section{The Algorithm in Full Detail}
+First we begin by obtaining all minutiae and their attributes from the fingerprint image.  As a result we will obtain a set of $N$ minutiae $M = \{m_0, m_1, ..., m_{N-1}\}$ within that image. Every minutiae $m_i \in M$ can be represented by its respective vector $m_i = (x_i, y_i, \theta_i, t_i)$, where $x_i$ and $y_i$ respectively represent the $x$ and $y$ coordinates of the minutiae $m_i$ on the fingerprint picture, $\theta_i$ represents the minutiae orientation, and finally $t_i$ represents the minutiae type. $\theta_i$ ranges between $(0, 2\pi)$, and $t_i$'s value is represented by single bit, signifying whether it is a ridge ending minutiae type or not. We choose to base $t_i$ around the ridge ending minutiae type, because it's the most commonly seen type of minutiae by a great margin compared to other minutiae types. 
+
+\subsection{Generation of the IFTs}
+With the minutiae data on hand, we begin generating the IFTs both under the Polar Coordinate-based scheme and the Delaunay Triangulation-based scheme.
+
+\subsubsection{Polar Coordinate-based IFT}
+Under this scheme, the final IFT ($C = \{P(m_i)\}_{i=0}^{N-1}$) is an array of vectors with 0 and 1 entries. Each IFT vector $P(m_i)$ is created based on a minutiae point $m_i$ which is used as an origin point. Now let's assume we want to derive $P(m_0)$, we would first have to take minutiae point $m_0$ as reference and calculate the three attributes $(\rho_i, \alpha_i, \beta_i)$ of the other minutiae with respect to $m_0$ as the origin point. 
+
+First off, only minutiae points that fall within a radius $R$ (= 300 pixels) of point $m_0$ are taken into account. Moreover, every other minutiae point's data relative to $m_0$ consists of three attributes. The radial distance $\rho_i$, which implies the distance from selected minutiae $m_i$ to the reference minutiae $m_0$, which ranges from: $0 \le \rho_i \le R = 300$.
+
+Next, we have the radial angle $\alpha_i$, which is the polar angle of minutiae point $m_i$ with respect to $m_0$ as the origin point. The third and last attribute, is the absolute minutiae orientation difference $\beta_i$, between between $m_0$ and $m_i$. Both $\alpha_i$ and $\beta_i$ range from: $0 \le \alpha_i, \beta_i \le 2\pi$.
+
+After the $(\rho_i, \alpha_i, \beta_i)$ triplet for every minutia $m_i \neq m_0$ is obtained, it's time to perform quantization on the three attributes. We assume that the step sizes for $\rho_i$, $\alpha_i$, and $\beta_i$ are $s_{\rho}$, $s_{\alpha}$, and $s_{\beta}$, where $5 \leq s_{\rho} \leq 20$ and $\pi/12 \leq s_{\alpha}, s_{\beta} \leq 2\pi/9$. Then we quantize the polar space around $m_0$ into a 3D cube containing $l_C = L \times S \times H$ cells, where $L = \lfloor R / s_{\rho} \rfloor$, $S = \lfloor 2\pi / s_{\alpha} \rfloor$, and $H = \lfloor 2\pi / s_{\beta} \rfloor$. The cell in which minutia point $m_i$ is located in the 3D cube is $(\rho^q_i, \alpha^q_i, \beta^q_i)$, where $\rho^q_i = \lfloor \rho_i / s_{\rho}\rfloor$, $\alpha^q_i = \lfloor \alpha_i / s_{\alpha} \rfloor$, and $\beta^q_i = \lfloor \beta_i / s_{\beta} \rfloor$. By doing so, we eventually get the vector $P(m_0)$ of length $l_C$, which consists of '1' and '0' entries, which is obtained by concatenating all the rows of cube cell values together in one line. The '1' indicates that one or more quantized minutiae points belong in that corresponding cube cell.
+
+The size of any vector $P(m_i) \in C$ depends on the value of $l_C$, which itself depends on the step sizes for the triplet attributes. The smaller the step sizes, the bigger $l_C$ will get and the more accurate our method becomes. And with our defined boundaries for step sizes, the largest $l_C$ can get, is 34560. To finish this section up, we repeat the same steps mentioned above for all other $m_i$, until we get all other $P(m_i)$ and obtain the full Polar Coordinate-based IFT ($C = \{P(m_i)\}_{i=0}^{N-1}$).
+
+
+
+\subsubsection{Delaunay Triangulation-based IFT}
+First we start by performing Delaunay Triangulation on all minutiae points in $M$, through either the Voronoi or the Bowyer-Watson algorithm. After all triangles are extracted, we need to go over every triangle $\triangle m_1m_2m_3$ and extract certain attributes from it for further processing. The IFT ($D$) under this scheme, is also similar to the Polar Coordinate-based IFT, in the fact that it is also an array of vectors with zero and one entries, with each vector dedicated to a triangle.
+
+Suppose we're processing the $\triangle m_1m_2m_3$ triangle. There are four attributes $(\alpha_i, l_i, h_i, t_i)$ we need to take into account. First one is $\alpha_i$, which is the size of the largest angle of the triangle, its value is ranged between $0 \le \alpha_i \le 2\pi$. Second and third one are $l_i$ and $h_i$, which are respectively the lengths of the larger and smaller edges of the $\alpha_i$ angle. Both are ranged between $0 \le l_i, h_i \le 300$. Finally, there's $t_i$ which is supposed to represent the minutiae types of the three vertices of the triangle using three bits. First bit is dedicated to the minutiae type of the largest angle's vertice, second and third are dedicated to the minutiae type of the vertices positioned on the larger and smaller edges of the triangle.
+
+At this point, all attributes other than $t_i$ (since it is already a three bit binary vector) need to be quantized. Similar to what we did in the Polar Coordinate-based IFT, the quantization step sizes are set to be $s_{\alpha}$, $s_l$, and $s_h$, which are respectively ranged at $\pi/12 \leq s_{\alpha} \leq \pi/9$, and $15 \leq s_l, s_h \leq 25$. To each attribute, the minimum amount of bits to cover all possible quantization values will be dedicated. For instance, if the value of $\alpha^q_i$ ranges between 0 and 9, then 4 bits will be dedicated to $\alpha^q_i$. The quantized value of each attribute is calculated as follows: $\alpha^q_i = \lfloor \alpha_i / s_{\alpha}\rfloor$, $l^q_i = \lfloor l_i / s_l\rfloor$, and $s^q_i = \lfloor h_i / s_h\rfloor$. Finally we convert each quantized attribute into binary, and concatanate every binarized attribute into a single list which we will refer to as $f^q_{m_1m_2m_3}$. The same should be done with every other triangle to achieve the entirety of our IFT set ($D$).
+
+\begin{center}
+	Example:
+	
+	$[\alpha^q_i, l^q_i, h^q_i, t_i]$ = [10,7,3,[0,0,1]] $\to$ [[1,0,1,0], [0,1,1,1], [0,0,1,1], [0,0,1]] = $f^q_{m_1m_2m_3}$
+\end{center}
+
+\subsection{Transformation of the IFTs into TFTs}
+With both Polar ($C$) and Delaunay ($D$) IFTs being generated, we move on to transforming them into their respective TFTs.
+
+\subsubsection{Polar Coordinate-based TFT}
+The transformation of the Polar IFT ($C$), involves subjecting each of its vectors to Feature Decorrelation and Random Projection. By the end of the process, we will have an array of complex valued vectors which will be stored for further use.
+
+First we need to put each $P(m_i) \in C$, through the Feature Decorrelation Algorithm, or optionally, its extension which is referred to as the Enhanced Feature Decorrelation Algorithm. Overall, the enhanced version allows for tighter security at the expense of performance and matching accuracy. A larger value of $L_S$ in the enhanced algorithm makes it more difficult to revert from $S_j^\prime$ to $S_j$, but at the same time would lower matching accuracy.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.48\textwidth]
+	{FDA}
+	\includegraphics[width=0.48\textwidth]
+	{EFDA}
+	\caption{The Feature Decorrelation Algorithm (Left) and its Enhanced version (Right)}
+\end{figure}
+
+After acquiring the decorrelated complex valued vector $\mathbb{P}(m_i)$ from either of the Feature Decorrelation Algorithms, we will have to project it to a lower dimension $Y$ using a random projection matrix $\mathbb{M}$:
+
+\begin{center}
+	$\widehat{P}(m_i) = \mathbb{M} \times \mathbb{P}(m_i)$
+\end{center}
+
+ The lower $Y$ is, the stronger the irreversibility gets. But in return, we will end up with poorer matching accuracy. After we repeat the same procedure with all $P(m_i) \in C$, we obtain our Polar Coordinate-based TFT: $\widehat{C} = \{\widehat{P}(m_i)\}^{N-1}_{i=0}$.
+
+\subsubsection{Delaunay Triangulation-based TFT}
+\subsection{Obtaining the Polar and Delaunay Matching Scores}
 \section{Used Tools}
 \section{Implementation}
 
@@ -195,6 +295,7 @@ The ARM attack, otherwise known as attack via record multiplicity, is an exploit
 \section{Performance Analysis}
 
 \chapter{Conclusion}
+
 
 \section{Future Work}
 

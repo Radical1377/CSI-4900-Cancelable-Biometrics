@@ -11,6 +11,11 @@ Henkel, L. (2021).
 \newblock Python delaunay triangulation.
 \newblock https://gitlab.com/LittleLeonie/delaunay-triangulation-py.
 
+\bibitem[\protect\citename{Lindenstrauss}{}{Johnson}{Lindenstrauss-Johnson}{2018}{lind84lem}]{lind84lem}
+Lindenstrauss, J., \& Johnson, W. (2018).
+\newblock Extensions of lipschitz maps into a hilbert space.
+\newblock {\em Contemporary Mathematics}, , 2018, 189--206.
+
 \bibitem[\protect\citename{Maltoni}{Maio,
   Jain}{Feng}{MaltoniETAL}{2022}{maltoni22fing}]{maltoni22fing}
 Maltoni, D., Maio, D., Jain, A.~K., \& Feng, J. (2022).

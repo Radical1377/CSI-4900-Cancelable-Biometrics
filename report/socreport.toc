@@ -11,30 +11,39 @@
 \contentsline {subsubsection}{Verification}{3}{}%
 \contentsline {subsection}{\numberline {1.3.2}Solution Properties}{4}{}%
 \contentsline {subsubsection}{Irreversibility}{4}{}%
-\contentsline {subsubsection}{Comparability}{4}{}%
-\contentsline {chapter}{\numberline {2}Preliminaries and Related Works}{5}{}%
-\contentsline {section}{\numberline {2.1}Concepts and Definitions}{5}{}%
-\contentsline {subsection}{\numberline {2.1.1}Minutiae Points}{5}{}%
-\contentsline {subsection}{\numberline {2.1.2}Delaunay Triangulation}{6}{}%
-\contentsline {subsubsection}{Voronoi Algorithm}{7}{}%
-\contentsline {subsubsection}{The Bowyer-Watson Algorithm}{8}{}%
-\contentsline {section}{\numberline {2.2}The Yang Method}{8}{}%
-\contentsline {subsection}{\numberline {2.2.1}Brief Outline}{8}{}%
-\contentsline {subsection}{\numberline {2.2.2}Advantages}{9}{}%
-\contentsline {subsubsection}{Reduced Non-Linear Distortion}{10}{}%
-\contentsline {subsubsection}{ARM Attack Invulnerability}{10}{}%
-\contentsline {subsection}{\numberline {2.2.3}Guarantee of Irreversibility}{10}{}%
-\contentsline {subsection}{\numberline {2.2.4}Guarantee of Comparability}{10}{}%
-\contentsline {chapter}{\numberline {3}Algorithm and Implementation}{11}{}%
-\contentsline {section}{\numberline {3.1}The Algorithm in Full Detail}{11}{}%
-\contentsline {section}{\numberline {3.2}Used Tools}{11}{}%
-\contentsline {section}{\numberline {3.3}Implementation}{11}{}%
-\contentsline {chapter}{\numberline {4}Evaluation}{12}{}%
-\contentsline {section}{\numberline {4.1}Recognition Accuracy of FingerFlow}{12}{}%
-\contentsline {section}{\numberline {4.2}Recognition Accuracy of the Yang Method}{12}{}%
-\contentsline {section}{\numberline {4.3}Performance Analysis}{12}{}%
-\contentsline {chapter}{\numberline {5}Conclusion}{13}{}%
-\contentsline {section}{\numberline {5.1}Future Work}{13}{}%
-\contentsline {chapter}{References}{14}{}%
+\contentsline {subsubsection}{Comparability}{5}{}%
+\contentsline {chapter}{\numberline {2}Preliminaries}{6}{}%
+\contentsline {section}{\numberline {2.1}Concepts and Definitions}{6}{}%
+\contentsline {subsection}{\numberline {2.1.1}Minutiae Points}{6}{}%
+\contentsline {subsection}{\numberline {2.1.2}Delaunay Triangulation}{7}{}%
+\contentsline {subsubsection}{Voronoi Algorithm}{8}{}%
+\contentsline {subsubsection}{The Bowyer-Watson Algorithm}{9}{}%
+\contentsline {section}{\numberline {2.2}The Yang Method}{9}{}%
+\contentsline {subsection}{\numberline {2.2.1}Brief Outline}{9}{}%
+\contentsline {subsection}{\numberline {2.2.2}Advantages}{11}{}%
+\contentsline {subsubsection}{Reduced Non-Linear Distortion}{11}{}%
+\contentsline {subsubsection}{ARM Attack Invulnerability}{12}{}%
+\contentsline {subsection}{\numberline {2.2.3}Guarantee of Irreversibility}{12}{}%
+\contentsline {subsubsection}{Polar Coordinate-based Scheme}{12}{}%
+\contentsline {subsection}{\numberline {2.2.4}Guarantee of Comparability}{13}{}%
+\contentsline {subsubsection}{Polar Coordinate-based Scheme}{13}{}%
+\contentsline {chapter}{\numberline {3}Algorithm and Implementation}{14}{}%
+\contentsline {section}{\numberline {3.1}The Algorithm in Full Detail}{14}{}%
+\contentsline {subsection}{\numberline {3.1.1}Generation of the IFTs}{14}{}%
+\contentsline {subsubsection}{Polar Coordinate-based IFT}{15}{}%
+\contentsline {subsubsection}{Delaunay Triangulation-based IFT}{16}{}%
+\contentsline {subsection}{\numberline {3.1.2}Transformation of the IFTs into TFTs}{17}{}%
+\contentsline {subsubsection}{Polar Coordinate-based TFT}{17}{}%
+\contentsline {subsubsection}{Delaunay Triangulation-based TFT}{18}{}%
+\contentsline {subsection}{\numberline {3.1.3}Obtaining the Polar and Delaunay Matching Scores}{18}{}%
+\contentsline {section}{\numberline {3.2}Used Tools}{18}{}%
+\contentsline {section}{\numberline {3.3}Implementation}{18}{}%
+\contentsline {chapter}{\numberline {4}Evaluation}{19}{}%
+\contentsline {section}{\numberline {4.1}Recognition Accuracy of FingerFlow}{19}{}%
+\contentsline {section}{\numberline {4.2}Recognition Accuracy of the Yang Method}{19}{}%
+\contentsline {section}{\numberline {4.3}Performance Analysis}{19}{}%
+\contentsline {chapter}{\numberline {5}Conclusion}{20}{}%
+\contentsline {section}{\numberline {5.1}Future Work}{20}{}%
+\contentsline {chapter}{References}{21}{}%
 \contentsline {chapter}{\numberline {A}Code}{A-1}{}%
 \contentsline {section}{\numberline {A.1}Bowyer-Watson Pseudo-Code}{A-1}{}%
