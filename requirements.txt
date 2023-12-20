@@ -1,0 +1,5 @@
+numpy
+delaunay-triangulation
+matplotlib
+numba
+fingerflow

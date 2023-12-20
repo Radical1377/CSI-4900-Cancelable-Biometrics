@@ -1,44 +1,13 @@
 import os, cv2, sys, copy, random, json, time
 import numpy as np
-import scipy.stats as stats
 from math import *
+from configuration import *
 from numpy import fft, linalg
 from matplotlib import pyplot as plt
-from PIL import Image, ImageDraw
 from numba import njit, jit, cuda
 from delaunay_triangulation.triangulate import delaunay
 from delaunay_triangulation.typing import Vertex
 
-R = 300 # Max Radial Distance
-
-SHOW_PIC = True
-
-# Minutiae Score threshold
-MIN_SCORE_THRESH = 0.0
-
-# PCB Feature Set Params
-PCB_STEP_RHO = 5 # RANGE 5 to 20
-PCB_STEP_ALPHA = 15 # RANGE 15 to 40 Degrees
-PCB_STEP_BETA = 15 # RANGE 15 to 40 Degrees
-
-# DTB Feature Set Params
-DTB_STEP_L = 15 # RANGE 15 to 25
-DTB_STEP_ALPHA = 15 # RANGE 15 to 20 Degrees
-DTB_STEP_O = 15 # RANGE 15 to 20 Degrees
-
-# Feature Decorrelation Algorithm Params
-LC = 20000 # Must be less than L*H*S
-NS = 1000 # Must divide LC
-
-# Projection Matrix Params
-PROJ_MAT_SEED = 1337 # Must be 32-bit integer
-PROJ_MAT_Y_DIM = 300 # Must be between 1-LC
-
-# Delaunay Code Permutation Params
-PERM_PHI = 1
-
-# Final Score Params
-FINAL_RHO = 0.7
 
 # Function for calculating the Feature Code P(mi) based on minutiae point m0
 def PCBFeatureCode(minutiae_points, m0):
@@ -52,7 +21,7 @@ def PCBFeatureCode(minutiae_points, m0):
 
     for point in minutiae_points:
 
-        xDiff = point[0] - m0[1]
+        xDiff = point[0] - m0[0]
         yDiff = point[1] - m0[1]
 
         # Calculate Rho (Radial Distance)
@@ -104,21 +73,27 @@ def DTBFeatureCode(triangle):
 
     # Edge Lengths
     edge_len = [[{0,1}, 0], [{1,2}, 0], [{0,2}, 0]]
-    #[0,1]
+
+    # [0,1]
     edge_len[0][1] = sqrt(pow(triangle[0][0]-triangle[1][0], 2) + pow(triangle[0][1]-triangle[1][1], 2))
-    #[1,2]
+
+    # [1,2]
     edge_len[1][1] = sqrt(pow(triangle[1][0]-triangle[2][0], 2) + pow(triangle[1][1]-triangle[2][1], 2))
-    #[0,2]
+
+    # [0,2]
     edge_len[2][1] = sqrt(pow(triangle[0][0]-triangle[2][0], 2) + pow(triangle[0][1]-triangle[2][1], 2))
 
     print("EDGE LEN: ", edge_len)
 
     # Calculating all angles and finding the largest one
     vert_ang = [[0,0], [1,0], [2,0]]
+
     # 0
     vert_ang[0][1] = degrees(acos((pow(edge_len[0][1],2) + pow(edge_len[2][1],2) - pow(edge_len[1][1],2)) / (2 * edge_len[0][1] * edge_len[2][1])))
+
     # 1
     vert_ang[1][1] = degrees(acos((pow(edge_len[0][1],2) + pow(edge_len[1][1],2) - pow(edge_len[2][1],2)) / (2 * edge_len[0][1] * edge_len[1][1])))
+
     # 2
     vert_ang[2][1] = degrees(acos((pow(edge_len[1][1],2) + pow(edge_len[2][1],2) - pow(edge_len[0][1],2)) / (2 * edge_len[1][1] * edge_len[2][1])))
 
@@ -203,7 +178,7 @@ def DTBFeatureCode(triangle):
 
 # Function for permuting the Delaunay Feature code
 def PermDelFeatCode(code):
-    LD = pow(2, 20)
+    LD = DEL_TFT_LEN
 
     FQ = []
     for q in code:
@@ -221,14 +196,14 @@ def PermDelFeatCode(code):
         for j in i:
             FIT.append(j)
     FIT = int("".join(str(x) for x in FIT), 2)
-    return (FC + FIT)
+    return (FC + FIT) % LD
 
 def GenerateDCap(code_arr):
     O_LEN = floor(log2(360/DTB_STEP_O)) + 1
     A_LEN = floor(log2(360/DTB_STEP_ALPHA)) + 1
     L_LEN = floor(log2(R/DTB_STEP_L)) + 1
 
-    LD = pow(2, O_LEN + A_LEN + L_LEN + L_LEN)
+    LD = DEL_TFT_LEN
 
     result_arr = [0] * int(LD)
 
@@ -297,11 +272,11 @@ def ProjectVect(vector):
 
 # Matlab's corr2 function
 
-
+@jit(target_backend='cuda')
 def corr2(a,b):
 
-    a = a - (np.sum(a) / pow(2,20))
-    b = b - (np.sum(b) / pow(2,20))
+    a = a - (np.sum(a) / DEL_TFT_LEN)
+    b = b - (np.sum(b) / DEL_TFT_LEN)
     r = (a*b).sum() / sqrt((a*a).sum() * (b*b).sum())
     return r
 
@@ -380,7 +355,10 @@ if __name__ == "__main__":
                 print("PCBFeatureCode Execution time:", end-start)
 
                 start = time.time()
-                tmp = EnFeatDecAlg(tmp)
+                if IS_DBA_ENHANCED:
+                    tmp = EnFeatDecAlg(tmp)
+                else:
+                    tmp = FeatDecAlg(tmp)
                 end = time.time()
                 print("EnFeatDecAlg Execution time:", end-start)
 
@@ -414,7 +392,7 @@ if __name__ == "__main__":
 
             json_output[file] = {"CT": CT, "DT": DT}
 
-        with open("test.npy", "wb") as outfile:
+        with open(NPY_FILE_NAME, "wb") as outfile:
             np.save(outfile, np.array([json_output]))
 
     # if JSON file is given as argument
@@ -424,16 +402,18 @@ if __name__ == "__main__":
         print("Loading NPY...")
         fingerprints = np.load(sys.argv[1], allow_pickle=True)[0]
 
-        files = fingerprints["FILES"]
-        """
-        files = []
-        for file in fingerprints["FILES"]:
-            if ("_1" in file) or ("_2" in file):
-                files.append(file)
-        """
+
+        if IS_1V1:
+            files = []
+            for file in fingerprints["FILES"]:
+                if ("_1" in file) or ("_2" in file):
+                    files.append(file)
+        else:
+            files = fingerprints["FILES"]
+
 
         """
-            Processed Data row format: [file1, file2, raw/norm sc_max, raw/norm sd, final_score]
+            Processed Data row format: [file1, file2, raw/norm sc_max, raw/norm sd, final_score_normal, final_score_del, final_score_polar]
         """
         processed_data = []
 
@@ -470,13 +450,22 @@ if __name__ == "__main__":
         for row in processed_data:
             row.append(FinalScore(row[2], row[3]))
 
+        FINAL_RHO = 0
+        for row in processed_data:
+            row.append(FinalScore(row[2], row[3]))
+
+        FINAL_RHO = 1
+        for row in processed_data:
+            row.append(FinalScore(row[2], row[3]))
+
         # Calculating FRR and FAR
         threshold_step = 0.001
         FAR = []
+        GAR = []
         FRR = []
+        EER = 0
 
         for threshold in np.arange(0.0, 1.0, threshold_step):
-            print(threshold)
             accepted_imposter = 0
             total_imposter = 0
             rejected_genuine = 0
@@ -496,12 +485,92 @@ if __name__ == "__main__":
 
             FAR.append(accepted_imposter / total_imposter)
             FRR.append(rejected_genuine / total_genuine)
+            GAR.append(1.0 - (rejected_genuine / total_genuine))
+
+            # Get EER
+            if FRR[-1] > FAR[-1] and EER == 0:
+                EER = (FAR[-1] + FAR[-2] + FRR[-1] + FRR[-2]) / 4
 
         # Plotting FAR and FRR based on threshold
-        plt.plot(list(np.arange(0.0, 1.0, threshold_step)),FRR,
-                list(np.arange(0.0, 1.0, threshold_step)), FAR)
+        plt.xlabel("Acceptance Threshold t")
+        plt.plot(list(np.arange(0.0, 1.0, threshold_step)), FAR, label = "FAR")
+        plt.plot(list(np.arange(0.0, 1.0, threshold_step)), FRR, label = "FRR")
+        plt.legend()
         plt.show()
 
-        # ROC Curve
-        plt.plot(FAR, FRR)
+        print("Normal EER Value: ", EER)
+        plt.xlabel("FAR")
+        plt.ylabel("GAR")
+        plt.plot(FAR, GAR, label = "Both Polar and Delaunay based schemes")
+
+        FAR = []
+        GAR = []
+        FRR = []
+        EER = 0
+        for threshold in np.arange(0.0, 1.0, threshold_step):
+            accepted_imposter = 0
+            total_imposter = 0
+            rejected_genuine = 0
+            total_genuine = 0
+            for row in processed_data:
+                # FAR Calculation
+                if row[0].split('_')[0] != row[1].split('_')[0]:
+                    total_imposter += 1
+                    if row[5] > threshold:
+                        accepted_imposter += 1
+
+                # FRR Calculation
+                if row[0].split('_')[0] == row[1].split('_')[0]:
+                    total_genuine += 1
+                    if row[5] < threshold:
+                        rejected_genuine += 1
+
+            FAR.append(accepted_imposter / total_imposter)
+            FRR.append(rejected_genuine / total_genuine)
+            GAR.append(1.0 - (rejected_genuine / total_genuine))
+
+            # Get EER
+            if FRR[-1] > FAR[-1] and EER == 0:
+                EER = (FAR[-1] + FAR[-2] + FRR[-1] + FRR[-2]) / 4
+
+        print("Delaunay EER Value: ", EER)
+        plt.xlabel("FAR")
+        plt.ylabel("GAR")
+        plt.plot(FAR, GAR, label = "Only Delaunay based scheme")
+
+        FAR = []
+        GAR = []
+        FRR = []
+        EER = 0
+        for threshold in np.arange(0.0, 1.0, threshold_step):
+            accepted_imposter = 0
+            total_imposter = 0
+            rejected_genuine = 0
+            total_genuine = 0
+            for row in processed_data:
+                # FAR Calculation
+                if row[0].split('_')[0] != row[1].split('_')[0]:
+                    total_imposter += 1
+                    if row[6] > threshold:
+                        accepted_imposter += 1
+
+                # FRR Calculation
+                if row[0].split('_')[0] == row[1].split('_')[0]:
+                    total_genuine += 1
+                    if row[6] < threshold:
+                        rejected_genuine += 1
+
+            FAR.append(accepted_imposter / total_imposter)
+            FRR.append(rejected_genuine / total_genuine)
+            GAR.append(1.0 - (rejected_genuine / total_genuine))
+
+            # Get EER
+            if FRR[-1] > FAR[-1] and EER == 0:
+                EER = (FAR[-1] + FAR[-2] + FRR[-1] + FRR[-2]) / 4
+
+        print("Polar EER Value: ", EER)
+        plt.xlabel("FAR")
+        plt.ylabel("GAR")
+        plt.plot(FAR, GAR, label = "Only Polar based scheme")
+        plt.legend()
         plt.show()
