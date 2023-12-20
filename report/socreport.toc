@@ -48,17 +48,21 @@
 \contentsline {subsubsection}{delaunay-triangulation}{22}{}%
 \contentsline {subsection}{\numberline {3.2.2}Nvidia CUDA}{22}{}%
 \contentsline {subsection}{\numberline {3.2.3}Hardware}{23}{}%
-\contentsline {chapter}{\numberline {4}Evaluation}{24}{}%
-\contentsline {section}{\numberline {4.1}Brief Introduction to Matching Metrics}{24}{}%
-\contentsline {subsection}{\numberline {4.1.1}GAR, FAR, FRR, and EER}{24}{}%
-\contentsline {section}{\numberline {4.2}Reliability of FingerFlow}{25}{}%
-\contentsline {section}{\numberline {4.3}Matching Accuracy of the Yang Method}{26}{}%
-\contentsline {subsection}{\numberline {4.3.1}Case 1: Both Schemes vs. Delaunay Only vs. Polar Only}{26}{}%
-\contentsline {subsection}{\numberline {4.3.2}Case 2: Feature Decorrelation Algorithm Parameters}{27}{}%
-\contentsline {section}{\numberline {4.4}Runtime Performance}{27}{}%
-\contentsline {chapter}{\numberline {5}Conclusion}{28}{}%
-\contentsline {section}{\numberline {5.1}What has been achieved}{28}{}%
-\contentsline {section}{\numberline {5.2}What is left to be achieved}{28}{}%
-\contentsline {chapter}{References}{29}{}%
+\contentsline {subsection}{\numberline {3.2.4}Running the Implementation}{24}{}%
+\contentsline {subsection}{\numberline {3.2.5}The Advantages of our Implementation}{24}{}%
+\contentsline {chapter}{\numberline {4}Evaluation}{25}{}%
+\contentsline {section}{\numberline {4.1}Brief Introduction to Matching Metrics}{25}{}%
+\contentsline {subsection}{\numberline {4.1.1}GAR, FAR, FRR, and EER}{26}{}%
+\contentsline {section}{\numberline {4.2}Reliability of FingerFlow}{26}{}%
+\contentsline {section}{\numberline {4.3}Matching Accuracy of the Yang Method}{27}{}%
+\contentsline {subsection}{\numberline {4.3.1}Case 1: Both Schemes vs. Delaunay Only vs. Polar Only}{28}{}%
+\contentsline {subsection}{\numberline {4.3.2}Case 2: Feature Decorrelation Algorithm Parameters}{29}{}%
+\contentsline {subsection}{\numberline {4.3.3}Case 3: Random Projection Matrix Dimension}{29}{}%
+\contentsline {section}{\numberline {4.4}Runtime Performance}{30}{}%
+\contentsline {section}{\numberline {4.5}Storage Requirement Comparison}{30}{}%
+\contentsline {chapter}{\numberline {5}Conclusion}{32}{}%
+\contentsline {section}{\numberline {5.1}What has been achieved}{32}{}%
+\contentsline {section}{\numberline {5.2}What is left to be achieved}{33}{}%
+\contentsline {chapter}{References}{34}{}%
 \contentsline {chapter}{\numberline {A}Code}{A-1}{}%
 \contentsline {section}{\numberline {A.1}Bowyer-Watson Pseudo-Code}{A-1}{}%

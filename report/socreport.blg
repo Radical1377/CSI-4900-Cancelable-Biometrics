@@ -8,45 +8,45 @@ while executing---line 1367 of file socreport.bst
 `month' is a missing field, not a string, for entry lind84lem
 while executing---line 1367 of file socreport.bst
 Warning--empty address in maltoni22fing
-You've used 7 entries,
+You've used 8 entries,
             2653 wiz_defined-function locations,
-            600 strings with 5297 characters,
-and the built_in function-call counts, 2731 in all, are:
-= -- 276
-> -- 121
-< -- 5
-+ -- 41
-- -- 41
-* -- 237
-:= -- 497
-add.period$ -- 21
-call.type$ -- 7
-change.case$ -- 49
-chr.to.int$ -- 7
-cite$ -- 15
-duplicate$ -- 84
-empty$ -- 166
-format.name$ -- 51
-if$ -- 521
+            604 strings with 5413 characters,
+and the built_in function-call counts, 3025 in all, are:
+= -- 310
+> -- 130
+< -- 6
++ -- 43
+- -- 43
+* -- 258
+:= -- 550
+add.period$ -- 24
+call.type$ -- 8
+change.case$ -- 55
+chr.to.int$ -- 8
+cite$ -- 17
+duplicate$ -- 94
+empty$ -- 183
+format.name$ -- 55
+if$ -- 579
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 5
-newline$ -- 38
-num.names$ -- 40
-pop$ -- 49
+newline$ -- 43
+num.names$ -- 45
+pop$ -- 54
 preamble$ -- 1
-purify$ -- 49
+purify$ -- 55
 quote$ -- 0
-skip$ -- 87
+skip$ -- 99
 stack$ -- 0
-substring$ -- 123
+substring$ -- 134
 swap$ -- 6
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 60
+type$ -- 69
 warning$ -- 1
-while$ -- 22
+while$ -- 24
 width$ -- 0
-write$ -- 110
+write$ -- 125
 (There were 2 error messages)

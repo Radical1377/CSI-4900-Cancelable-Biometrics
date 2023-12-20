@@ -5,6 +5,7 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{color}
+\usepackage[table,xcdraw]{xcolor}
 \graphicspath{ {./images/} }
 
 \newcommand\norm[1]{\lVert#1\rVert}
@@ -37,13 +38,13 @@
 \advisor{Dr. Carlisle Adams}
 \maketitle
 \begin{abstract}
-In this report, we analyze, implement, and verify a specific cancelable biometric method from a 2018 research paper \cite{wencheng18cbio}, which is used for transforming fingerprint templates. Our implementation of this method has been solely developed on Python over the course of three months with the help of some open source python libraries. The implementation closely follows the given algorithms on the paper and bears certain advantages in comparison such as improved runtime performance using GPU utilization (powered by NVIDIA CUDA), and all tools involved being fully open source and free to use. The verification of the paper's results was done by running the implementation on the same FVC fingerprint datasets used on the paper and other datasets, using the same parameter configurations as indicated in their different test cases. Similar outcomes to those on the paper were achieved as a result, which further proved the security and accuracy of this method for fingerprint matching.
+In this report, we analyze, implement, and verify a specific cancelable biometric method from a 2018 research paper \cite{wencheng18cbio}, which is used for transforming fingerprint templates. Our implementation of this method has been solely developed on Python over the course of three months with the help of some open source python libraries. The implementation closely follows the given algorithms on the paper and bears certain advantages in comparison such as improved runtime performance using GPU utilization (powered by NVIDIA CUDA), and all tools involved being fully open source and free to use. The verification of the paper's results was done by running the implementation on the same FVC fingerprint datasets used on the paper, using the same parameter configurations as indicated in their different test cases. In regards to the EER values, different outcomes to those on the paper were achieved as a result, which failed to confirm the claimed fingerprint matching accuracy of this method. However, some of the advantages of our implementation are described in detail and proven within this paper. Our implementation's source code is currently shared on a public repository on Github \cite{project}. 
 
 \begin{keywords}
 	Fingerprint, Cancelable Biometrics
 \end{keywords}
 \begin{implement}
-	Python 3, Anaconda, Numba, TensorFlow, Nvidia CUDA 
+	Python 3, Anaconda, Numba, TensorFlow, Nvidia CUDA, Git
 \end{implement}
 \end{abstract}
 
@@ -186,7 +187,7 @@ After the two IFTs of the target fingerprint are obtained, we obtain the two IFT
 \end{figure}
 
 \subsection{Advantages}
-The main contributions of the Yang method compared to the previously mentioned works, involve the following advantages:
+The main contributions of the Yang method compared to the previous works in cancelable biometrics, include the following advantages:
 
 \subsubsection{Reduced Non-Linear Distortion}
 Since the Yang method's IFT and final result depend on a combination of the Polar Coordinate-based and Delaunay Triangulation-based schemes, the impact of non-linear distortion, which would lead to recognition inaccuracy being reduced. Roughly speaking, non-linear distortion results from systems in which the output signal is not exactly proportional to the input signal. 
@@ -225,7 +226,7 @@ Overall, the JL lemma states that our IFT vectors in $\mathbb{R}^N$ vector space
 
 
 \chapter{Algorithm and Implementation}
-This chapter will include the full description of the Yang method and the generations of its IFTs and TFTs. In addition, we will go over the list of tools and frameworks utilized for our implmentation and the reason behind the selection of said tools. Finally, the whole development process and the challenges involved in it will be provided in a detailed manner.
+This chapter will include the full description of the Yang method and the generations of its IFTs and TFTs. In addition, we will go over the list of tools and frameworks utilized for our implmentation and the reason behind the selection of said tools. We will also go over the instructions for running the code, and the advantages of our implementation.
 
 \section{The Algorithm in Full Detail}
 First we begin by obtaining all minutiae and their attributes from the fingerprint image.  As a result we will obtain a set of $N$ minutiae $M = \{m_0, m_1, ..., m_{N-1}\}$ within that image. Every minutiae $m_i \in M$ can be represented by its respective vector $m_i = (x_i, y_i, \theta_i, t_i)$, where $x_i$ and $y_i$ respectively represent the $x$ and $y$ coordinates of the minutiae $m_i$ on the fingerprint picture, $\theta_i$ represents the minutiae orientation, and finally $t_i$ represents the minutiae type. $\theta_i$ ranges between $(0, 2\pi)$, and $t_i$'s value is represented by single bit, signifying whether it is a ridge ending minutiae type or not. We choose to base $t_i$ around the ridge ending minutiae type, because it's the most commonly seen type of minutiae by a great margin compared to other minutiae types. 
@@ -350,7 +351,7 @@ Anaconda itself, is a Python distribution which is mainly meant for scientific p
 \subsubsection{FingerFlow}
 FingerFlow is a python framework for extracting fingerprint minutiae and their respective properties directly from images as input, and returns the minutiae data as a Pandas dataframe \cite{fingerflow}. FingerFlow itself is based around two other Machine Learning and Deep Learning frameworks named TensorFlow and Keras respectively. It is also capable of utilizing CUDA drivers via TensorFlow's capabilities to speed up the minutiae detection.
 
-For it to work, we need to supply it with a few prebuilt .H5 formatted model files, which are provided in the FingerFlow's Git repository. FingerFlow is also capable of matching fingerprints and providing us with a matching score. In Chapter 4, we will analyze FingerFlow's performance when it's utilizing the CPU versus when it utilizes the GPU.
+For it to work, we need to supply it with a few prebuilt .H5 formatted model files named CoarseNet, FineNet, ClassifyNet, and CoreNet, which are provided as links in the FingerFlow project's GitHub repository page. FingerFlow is also capable of matching fingerprints and providing us with a matching score. In Chapter 4, we will analyze FingerFlow's performance when it's utilizing the CPU versus when it utilizes the GPU.
 
 \subsubsection{NumPy}
 The NumPy library is our go to for mathematical operations used in our application, such as matrix multiplications, normalization, calculating norms, and so on. Another use for it, is for it to encode and save our calculated TFT data to a file using its \texttt{save()} method. The purpose of this is to be able to quickly load the TFT data for extracting statistical results, without having to go through the previous steps again. So as a result we will save a great amount of time in our experiments, at the cost of some disk space.
@@ -365,7 +366,7 @@ This library provides us with a ready to use Bowyer-Watson algorithm for derivin
 CUDA (or Compute Unified Device Architecture) is a driver and API (Application Programming Interface) exclusive to Nvidia graphics cards that gives the developers direct access to parallel computational elements and the GPU's virtual instruction set. CUDA's parallel computation capabilities is utilized by both FingerFlow and Numba for faster computation. So far in our implementation, the performance has only been raised linearly, and there's little room for optimization due to project time constraints and a lack of hands-on CUDA programming experience.
 
 \subsection{Hardware}
-Our implementation has been successfully tested on two separate computer platforms, and runs on both platforms without flaw. One being a home desktop (GPU only) running on the Windows 10 Pro operating system. The other being a Lenovo ThinkPad model T430s laptop (CPU only) running on the Fedora 37 operating system. So far, mostly the home desktop has been used for conducting test cases, due to the significant runtime speed that its GPU provides. The full specifications of both platforms are provided in the figure below.
+Our implementation has been successfully tested on two separate computer platforms, and runs on both platforms without flaw. One being a home desktop (GPU only) running on the Windows 10 Pro operating system. The other being a Lenovo ThinkPad model T430s laptop (CPU only) running on the Fedora 37 Linux-based operating system. So far, mostly the home desktop has been used for conducting test cases, due to the significant runtime speed that its GPU provides. The full specifications of both platforms are provided in the figure below.
 
 \begin{figure}[H]
 	\centering
@@ -376,8 +377,27 @@ Our implementation has been successfully tested on two separate computer platfor
 	\caption{Full system specifications of both Linux and Windows platforms}
 \end{figure}
 
+\subsection{Running the Implementation}
+Our implementation's main entry point is a Python program file named \texttt{main.py}. The Python program takes an argument as input. We must first, as a command line argument, give it the path to a directory which contains all of the fingerprint pictures files within our dataset.
+\begin{center}
+	\texttt{python main.py D:$\backslash$path-to-directory$\backslash$}
+\end{center}
+Each file name must follow this format: \texttt{<finger\_id\_number>\_<finger\_impression\_number>.tiff}. For instance, \texttt{101\_4.tiff} is the fingerprint picture of the 4th impression of finger number 101.
+
+After processing a whole dataset, the program saves all TFT data within a .npy file in the same directory as \texttt{main.py}. To obtain the matching score related results, we must run the \texttt{main.py} file again, but this time we must give it the path to our desired .npy file.
+\begin{center}
+	\texttt{python main.py D:$\backslash$path-to-file$\backslash$test.npy}
+\end{center}
+
+\subsection{The Advantages of our Implementation}
+In comparison to the original implementation of the Yang method, our implementation possess two main advantages. For one, our implementation is fully free and open source. All the libraries, datasets, and frameworks we've used are completely free of charge and are available as open source repositories on GitHub or any other Git-related platforms. Thus the results within our paper can be easily verified by visiting our project's repository page and running our source code to obtain the same results.
+
+The second advantage, is the capability of our code to utilize the GPU's CUDA cores for parallel processing and greatly improving our code's runtime performance to when only the CPU is utilized.
+
 \chapter{Evaluation}
-In this chapter, our sole focus will be on the algorithm's fingerprint matching accuracy, runtime performance, and memory usage. We will use the same exact fingerprint datasets used in the article for conducting our matching accuracy tests. Unfortunately, due to time constraints, it was not possible to conduct security related tests, such as testing ARM attack invulnerability, revocability, and unlinkability.
+In this chapter, our sole focus will be on the algorithm's fingerprint matching accuracy, runtime performance, and memory usage. We will use the same exact fingerprint datasets used in the article for conducting our matching accuracy tests. Unfortunately, due to time constraints, it was not possible to conduct security related tests, such as testing ARM attack invulnerability, revocability, and unlinkability. 
+
+Also the EERs we've obtained were nowhere close to the EERs obtained in the Yang paper. Even after weeks of investigation and fixing multiple typos in our implementation, the root cause of this deviation has not been found yet.
 
 \section{Brief Introduction to Matching Metrics}
 To determine the matching accuracy of any method, we need to first of all process a fingerprint dataset and derive all the matching scores between all possible pairs of fingerprints. Next, we'll declare a variable named the Acceptance Threshold $t_A$ which is ranged between 0 and 1. The use for this variable is to declare whether two fingerprints match each other and belong to the same finger or not. If a fingerprint pair's matching score is higher than $t_A$, then the fingerprint pair are considered to be matching each other and accepted as a result. If on the other hand, the matching score is lower than the threshold, the fingerprint pair is deemed as rejected.
@@ -398,7 +418,7 @@ By starting at 0 and incrementing $t_A$ by 0.001, we can eventually get to the p
 \section{Reliability of FingerFlow}
 First we need to look into FingerFlow itself and see whether it works as intended and gives us the right minutiae to work with or not. One way to confirm this, would be to give FingerFlow a dataset of fingerprints, and then have it calculate the matching scores for every pair using its own built in method for matching. Then an ROC curve will have to be drawn based on its GAR and FAR.
 
-Unfortunately, we haven't been able to utilize FingerFlow's matching functionality due to a lack of documentation and not having enough time to reverse engineer the source code. So the only thing we have to work with, is the developer's own ROC curve plot which is based off of an unknown fingerprint dataset, and multiple matching modules referred to as VerifyNet which come in different versions.
+Unfortunately, we haven't been able to utilize FingerFlow's matching functionality due to a lack of documentation and not having enough time to reverse engineer its source code to find out the appropriate input for its matching function. So the only thing we have to work with, is the developer's own ROC curve plot which is based off of an unknown fingerprint dataset, and multiple matching modules referred to as VerifyNet which come in different versions.
 
 \begin{figure}[H]
 	\centering
@@ -407,8 +427,10 @@ Unfortunately, we haven't been able to utilize FingerFlow's matching functionali
 	\caption{FingerFlow's ROC curve generated by different VerifyNet modules}
 \end{figure}
 
+Assuming this very limited information to be true, we can conclude that the deviation in the EERs obtained by our implementation, has less to do with FingerFlow itself, and may have to do with either an issue within the implementation itself, or it missing some vital factor in its entirety.
+
 \section{Matching Accuracy of the Yang Method}
-The fingerprint datasets used for this section are: FVC 2002DB1, FVC 2002DB2, FVC 2002DB3, FVC 2004DB4. Each of which include 80 fingerprint images in total, which are 8 different impressions of 10 different fingerprints. We also have two different protocols involved for the selection of fingerprint pairs. The default protocol considers the set of all pair selections from the whole dataset, but the 1V1 protocol only considers the set of all pair selections from the first two impressions of each fingerprint, resulting in a smaller dataset to work with.
+The fingerprint datasets used for this section are: FVC 2002 DB1, FVC 2002 DB2, FVC 2002 DB3, FVC 2004 DB4. Each of which include 80 fingerprint images in total, which are 8 different impressions of 10 different fingerprints. We also have two different protocols involved for the selection of fingerprint pairs. The default protocol considers the set of all pair selections from the whole dataset, but the 1V1 protocol only considers the set of all pair selections from the first two impressions of each fingerprint, resulting in a smaller dataset to work with.
 
 \subsection{Case 1: Both Schemes vs. Delaunay Only vs. Polar Only}
 In this section, under the 1V1 protocol performed on the FVC 2002 DB2 dataset, using the regular Feature Decorrelation Algorithm, and a projection matrix dimension $Y$ of 300, we are going to derive  three ROC curves from three instances where both schemes, only the delaunay scheme, and only the polar scheme was used for obtaining the final score. Below are the ROC curve figures on the paper compared to the one we derived from our implementation:
@@ -422,18 +444,106 @@ In this section, under the 1V1 protocol performed on the FVC 2002 DB2 dataset, u
 	\caption{The three ROC curves derived from our and the author's implementation}
 \end{figure}
 
-The resulting EERs we got from the three instances are as follows: Delaunay only EER = 0.3986, Polar only EER = 0.434, Normal only EER = 0.3986.
+The resulting EERs we got from the three instances are as follows: Delaunay only EER = 0.400, Polar only EER = 0.197, Regular EER = 0.220.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.45\textwidth]
+	{FARFRR}
+	\includegraphics[width=0.45\textwidth]
+	{33ROC}
+	\caption{The ROC curves and FAR(t)/FRR(t) plots derived from Default protocol using the same dataset as above}
+\end{figure}
 
 \subsection{Case 2: Feature Decorrelation Algorithm Parameters}
-In this test case we're going to see the effects of changing the parameters within both the enhanced and normal versions of the Feature Decorrelation Algorithm, namely $L_C$ and $L_S$.
+In this test case we're going to see the effects of changing the parameters within both the enhanced and normal versions of the Feature Decorrelation Algorithm, namely $L_C$ and $L_S$. This will be done under the datasets FVC 2002 DB2 and FVC 2002 DB3, and the 1V1 protocol.
+
+
+\begin{table}[H]
+	\centering
+\begin{tabular}{|lccc|}
+	\hline
+	\multicolumn{4}{|c|}{\cellcolor[HTML]{DAE8FC}Using Regular Feature Decorrelation Algorithm}                                                           \\ \hline
+	\multicolumn{1}{|l|}{$L_C$}                       & \multicolumn{1}{c|}{20000}              & \multicolumn{2}{c|}{500}                                   \\ \hline
+	\multicolumn{1}{|l|}{FVC2002 DB2}              & \multicolumn{1}{c|}{0.298}              & \multicolumn{2}{c|}{0.400}                                 \\ \hline
+	\multicolumn{1}{|l|}{FVC2002 DB3}              & \multicolumn{1}{c|}{0.463}              & \multicolumn{2}{c|}{0.527}                                 \\ \hline
+	\multicolumn{4}{|c|}{\cellcolor[HTML]{DAE8FC}\begin{tabular}[c]{@{}c@{}}Using Enhanced Feature Decorrelation Algorithm\\ and $L_C$ = 20000\end{tabular}} \\ \hline
+	\multicolumn{1}{|l|}{$L_S$}                       & \multicolumn{1}{c|}{50}                 & \multicolumn{1}{c|}{5}                 & 1                 \\ \hline
+	\multicolumn{1}{|l|}{FVC2002 DB2}              & \multicolumn{1}{c|}{0.230}              & \multicolumn{1}{c|}{0.220}             & 0.298             \\ \hline
+	\multicolumn{1}{|l|}{FVC2002 DB3}              & \multicolumn{1}{c|}{0.234}              & \multicolumn{1}{c|}{0.300}             & 0.463             \\ \hline
+\end{tabular}
+	\caption{EERs derived from different parameters in both Feature Decorrelation Algorithms}
+\end{table}
+
+As it can be seen, the increase of EER is positively correlated with the increase in $L_S$ and decrease in $L_C$.
+
+\subsection{Case 3: Random Projection Matrix Dimension}
+In this test case we will compare the matching performance under different values of Random Projection matrix dimension $Y$. This will be done under the datasets FVC 2002 DB2 and FVC 2002 DB3, and the 1v1 protocol.
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|
+			>{\columncolor[HTML]{DAE8FC}}l |l|l|}
+		\hline
+		Y           & 300   & 50    \\ \hline
+		FVC2002 DB2 & 0.298 & 0.368 \\ \hline
+		FVC2002 DB3 & 0.468 & 0.465 \\ \hline
+	\end{tabular}
+	\caption{EERs derived from different Y dimensions of the Random Projection Matrix}
+\end{table}
 
 \section{Runtime Performance}
+This section is dedicated to comparing the runtime performances of different functions in our implementation. The average runtime lengths of these functions, under both the CPU only environment and the CUDA powered environment is described in the table below:
 
+% Please add the following required packages to your document preamble:
+% \usepackage[table,xcdraw]{xcolor}
+% Beamer presentation requires \usepackage{colortbl} instead of \usepackage[table,xcdraw]{xcolor}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\rowcolor[HTML]{DAE8FC} 
+		\multicolumn{1}{|c|}{\cellcolor[HTML]{DAE8FC}Function} & \multicolumn{1}{c|}{\cellcolor[HTML]{DAE8FC}Average CPU Runtime} & Average GPU Runtime \\ \hline
+		Extraction of a Single Minutiae (FingerFlow)           & $\sim$350 ms                                                     & $\sim$60 ms         \\ \hline
+		Extraction of all Minutiae in fingerprint (FingerFlow) & $\sim$65 s                                                       & $\sim$11 s          \\ \hline
+		Random Projection Matrix Multiplication (Numba)        & $\sim$1.1 s                                                      & $\sim$0.1 s         \\ \hline
+	\end{tabular}
+	\caption{Table of Runtime Performance comparison}
+\end{table}
+As seen in the table above, GPU utilization has linearly improved our runtime performance in almost all cases. In case of small scale basic operations, there were no distinguishable change in performance in either environment.
+
+As for the matching times, the author claims in their paper that finding the \texttt{SD} of a fingerprint pair takes around 0.00872 seconds, and finding each \texttt{SC} takes around 0.000171 seconds. If we assume each fingerprint has 20 minutiae on average, therefore each Polar TFT array has 20 vectors inside it. Hence calculating \texttt{SC\_MAX} would takr $20 \times 20 \times 0.000171 = 0.0684$ seconds in total.
+
+In our implementation, calculating \texttt{SD} takes around 0.1 seconds on average when the size of our Delaunay TFT is $2^{20}$ bits, and 0.001 seconds when it is reduced to only 20000 bits. Calculating the \texttt{SC\_MAX} of a pair of fingerprints takes around 0.08 seconds on average altogether. It is safe to claim that our implementation's performance is superior to the original implementation by a good margin.
+
+\section{Storage Requirement Comparison}
+Here we will compare the storage size of the saved TFT data in our and the author's implementation. On average, the size of each of our NPY files, which would contain all the TFT of an entire dataset of 80 fingerprints, comes down to 180 MBs. That's around 2.25 MBs of disk space dedicated to both the Polar and Delaunay TFTs of a single fingerprint if the total file size is evenly distributed. Also note that NumPy also compresses the saved data before writing it to an output file, meaning that our file would be larger than 180 MBs on average if it weren't compressed. 
+
+Some of this bloated size is because of the Delaunay TFT, which is $2^{20}$ bits or 128 KBs in size per Delaunay TFT of a fingerprint. If we reduce the Delaunay TFT size to 20000 bits or 2.4 KBs, we'd see a reduction of 125 KBs per fingerprint. Therefore for a database of 80 fingerprints, optimally only 192 KBs of data would be solely dedicated to the Delaunay TFTs, and only 9.7 MBs of space would be saved. Therefore, most of the bloat would be dedicated to the Polar TFT because it stores huge arrays with accurate complex valued entries for which the real and imaginary portions are both 32 bit floating point values.
+
+What the author claims about their TFT sizes in their implementation, is that for a single fingerprint, the Delaunay TFT is around 20,000 bits or 2.5 KBs in size, and the Polar TFT takes close to 4.7 KBs per vector, for which if we assume that each fingerprint has an average of 20 minutiae, the total Polar TFT size amounts to roughly 94 KBs. In total the size of a single fingerprint's saved TFT data in the author's implementation is 96.5 KBs.
+
+Overall, the storage requirement of our implementation can be greatly optimized if we were to reduce the accuracy of the complex values within the Polar TFT vectors. During runtime, the RAM usage is the same as the NPY file's size.
 \chapter{Conclusion}
-
+In the final chapter of this report, we will be discussing our achievements and what is left to be achieved in future versions of our implementation.
 
 \section{What has been achieved}
+In regards to the underlying concepts and theory of the Yang method article, I am satisfied to declare that I've almost entirely understood the intricacies of each procedure and concept within the paper and have managed to implement each of them to the best of my understandings and ability.
+
+Other achievements in this project were the advantages discussed in 3.2.4 regarding the project being completely open source, and its capability to utilize an Nvidia GPU's CUDA cores for parallel processing, which opens up potential to further contributions to this project, and even others' collaboration in it.
+
+I would claim that the greatest challenge in this project, was not the implementation of the method, but understanding the method itself despite there being a lot of ambiguity and vagueness within the explanations and descriptions of the 2018 paper. Fortunately, during the development period, I was able to get into contact with the main author of the 2018 paper, Dr. Wencheng Yang, and have him explain to me some of the details I've either missed out on or misunderstood. They were also considerate enough to share snippets of their MATLAB source codes via email, despite the closed source nature of their paper and its respective implementation.
+
 \section{What is left to be achieved}
+Some of the things that were left out as a result of our project's time constraints, which may be added in the future versions, include debugging, thorough documentation, and containerization of our implementation. 
+
+Debugging would involve fixing the implementation and riding it of inaccuracies that cause the deviation in the achieved EER data. Thorough documentation would include the explanation behind every constant variable used in the implementation, and an installation manual for the implementation.
+
+Unfortunately, as of now, it would be difficult for someone to run our implementation on their own machine, due to the intricate setup needed for it and a lack of installation instructions. Containerization with Docker is another viable solution to this, which would involve the user generating their own Docker image from a pre-written Dockerfile placed in the project repository, and creating a Docker container and running the code on it in an isolated environment.
+
+Also there exist numerous fingerprint datasets online (on websites such as Kaggle) in addition to FVC datasets we've used in this project. Those would be a great addition to this project in future test cases.
+
 \bibliographystyle{socreport}
 \bibliography{socreport}
 
