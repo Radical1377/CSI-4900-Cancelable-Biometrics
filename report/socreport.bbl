@@ -1,5 +1,10 @@
 \begin{thebibliography}{}
 
+\bibitem[\protect\citename{Arendáč}{}{}{Arendáč}{2021}{fingerflow}]{fingerflow}
+Arendáč, J. (2021).
+\newblock Fingerflow.
+\newblock https://github.com/jakubarendac/fingerflow.
+
 \bibitem[\protect\citename{Delaunay}{}{}{Delaunay}{1934}{delaunay34trig}]{delaunay34trig}
 Delaunay, B. (1934).
 \newblock Sur la sphere vide.
@@ -22,11 +27,10 @@ Maltoni, D., Maio, D., Jain, A.~K., \& Feng, J. (2022).
 \newblock {\em Handbook of fingerprint recognition}.
 \newblock Springer Nature Switzerland AG.
 
-\bibitem[\protect\citename{Manisha}{}{Kumar}{Manisha-Kumar}{2019}{kumar19cbio}]{kumar19cbio}
-Manisha, \& Kumar, N. (2019).
-\newblock Cancelable biometrics: A comprehensive survey.
-\newblock {\em Artificial Intelligence Review}, {\em 2020\/}, October, 2019,
-  3403--3446.
+\bibitem[\protect\citename{MathWorks}{}{}{MathWorks}{2023}{corr2}]{corr2}
+MathWorks (2023).
+\newblock Matlab documentation - 2d correlation coefficient.
+\newblock https://www.mathworks.com/help/images/ref/corr2.html.
 
 \bibitem[\protect\citename{Yang}{Hu,
   Wang}{Wu}{YangETAL}{2018}{wencheng18cbio}]{wencheng18cbio}
