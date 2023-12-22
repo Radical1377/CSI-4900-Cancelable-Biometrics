@@ -114,7 +114,7 @@ The exterior of a human fingertip is a pattern of interleaved ridges and valleys
 	\centering
 	\includegraphics[width=0.65\textwidth]
 	{minutiae_types}
-	\caption{Seven most common minutiae types}
+	\caption{Seven most common minutiae types (Maltoni et al., 2022)}
 \end{figure}
 
 \newpage The points in which these discontinuities or changes in ridge pattern occur, are referred to as minutiae points. Minutiae points possess several inherent attributes, but we will only need a few of them for our purposes. Each minutiae point has the following primary attributes include: X-Y cartesian coordinates, minutiae orientation, minutiae type, and a confidence score.
@@ -433,7 +433,7 @@ Assuming this very limited information to be true, we can conclude that the devi
 The fingerprint datasets used for this section are: FVC 2002 DB1, FVC 2002 DB2, FVC 2002 DB3, FVC 2004 DB4. Each of which include 80 fingerprint images in total, which are 8 different impressions of 10 different fingerprints. We also have two different protocols involved for the selection of fingerprint pairs. The default protocol considers the set of all pair selections from the whole dataset, but the 1V1 protocol only considers the set of all pair selections from the first two impressions of each fingerprint, resulting in a smaller dataset to work with.
 
 \subsection{Case 1: Both Schemes vs. Delaunay Only vs. Polar Only}
-In this section, under the 1V1 protocol performed on the FVC 2002 DB2 dataset, using the regular Feature Decorrelation Algorithm, and a projection matrix dimension $Y$ of 300, we are going to derive  three ROC curves from three instances where both schemes, only the delaunay scheme, and only the polar scheme was used for obtaining the final score. Below are the ROC curve figures on the paper compared to the one we derived from our implementation:
+In this section, under the 1V1 protocol performed on the FVC 2002 DB2 dataset, using the regular Feature Decorrelation Algorithm, and a projection matrix dimension $Y$ of 300, we are going to derive  three ROC curves from three instances where both schemes, only the Delaunay scheme, and only the polar scheme was used for obtaining the final score. Below are the ROC curve figures on the paper compared to the one we derived from our implementation:
 
 \begin{figure}[H]
 	\centering
@@ -494,7 +494,7 @@ In this test case we will compare the matching performance under different value
 \end{table}
 
 \section{Runtime Performance}
-This section is dedicated to comparing the runtime performances of different functions in our implementation. The average runtime lengths of these functions, under both the CPU only environment and the CUDA powered environment is described in the table below:
+This section is dedicated to comparing the Runtime performances of different functions in our implementation. The average runtime lengths of these functions, under both the CPU only environment and the CUDA powered environment is described in the table below:
 
 % Please add the following required packages to your document preamble:
 % \usepackage[table,xcdraw]{xcolor}
@@ -513,18 +513,19 @@ This section is dedicated to comparing the runtime performances of different fun
 \end{table}
 As seen in the table above, GPU utilization has linearly improved our runtime performance in almost all cases. In case of small scale basic operations, there were no distinguishable change in performance in either environment.
 
-As for the matching times, the author claims in their paper that finding the \texttt{SD} of a fingerprint pair takes around 0.00872 seconds, and finding each \texttt{SC} takes around 0.000171 seconds. If we assume each fingerprint has 20 minutiae on average, therefore each Polar TFT array has 20 vectors inside it. Hence calculating \texttt{SC\_MAX} would takr $20 \times 20 \times 0.000171 = 0.0684$ seconds in total.
+As for the matching times, the author claims in their paper that finding the \texttt{SD} of a fingerprint pair takes around 0.00872 seconds, and finding each \texttt{SC} takes around 0.000171 seconds. If we assume each fingerprint has 20 minutiae on average, therefore each Polar TFT array has 20 vectors inside it. Hence calculating \texttt{SC\_MAX} would take $20 \times 20 \times 0.000171 = 0.0684$ seconds in total.
 
 In our implementation, calculating \texttt{SD} takes around 0.1 seconds on average when the size of our Delaunay TFT is $2^{20}$ bits, and 0.001 seconds when it is reduced to only 20000 bits. Calculating the \texttt{SC\_MAX} of a pair of fingerprints takes around 0.08 seconds on average altogether. It is safe to claim that our implementation's performance is superior to the original implementation by a good margin.
 
 \section{Storage Requirement Comparison}
 Here we will compare the storage size of the saved TFT data in our and the author's implementation. On average, the size of each of our NPY files, which would contain all the TFT of an entire dataset of 80 fingerprints, comes down to 180 MBs. That's around 2.25 MBs of disk space dedicated to both the Polar and Delaunay TFTs of a single fingerprint if the total file size is evenly distributed. Also note that NumPy also compresses the saved data before writing it to an output file, meaning that our file would be larger than 180 MBs on average if it weren't compressed. 
 
-Some of this bloated size is because of the Delaunay TFT, which is $2^{20}$ bits or 128 KBs in size per Delaunay TFT of a fingerprint. If we reduce the Delaunay TFT size to 20000 bits or 2.4 KBs, we'd see a reduction of 125 KBs per fingerprint. Therefore for a database of 80 fingerprints, optimally only 192 KBs of data would be solely dedicated to the Delaunay TFTs, and only 9.7 MBs of space would be saved. Therefore, most of the bloat would be dedicated to the Polar TFT because it stores huge arrays with accurate complex valued entries for which the real and imaginary portions are both 32 bit floating point values.
+Most of this bloated size is because of the Delaunay TFT, which is $2^{20}$ bits or 128 KBs in size per Delaunay TFT of a fingerprint. If we reduce the Delaunay TFT size to 20000 bits or 2.4 KBs, we'd get a file that is only around 8.93 MBs on average. Overall, that's 114 KBs per fingerprint on average. 
 
 What the author claims about their TFT sizes in their implementation, is that for a single fingerprint, the Delaunay TFT is around 20,000 bits or 2.5 KBs in size, and the Polar TFT takes close to 4.7 KBs per vector, for which if we assume that each fingerprint has an average of 20 minutiae, the total Polar TFT size amounts to roughly 94 KBs. In total the size of a single fingerprint's saved TFT data in the author's implementation is 96.5 KBs.
 
 Overall, the storage requirement of our implementation can be greatly optimized if we were to reduce the accuracy of the complex values within the Polar TFT vectors. During runtime, the RAM usage is the same as the NPY file's size.
+
 \chapter{Conclusion}
 In the final chapter of this report, we will be discussing our achievements and what is left to be achieved in future versions of our implementation.
 

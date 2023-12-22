@@ -1,7 +1,7 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {1.1}{\ignorespaces A simplified diagram of the Enrolment and Verification pipelines}}{4}{}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Seven most common minutiae types}}{6}{}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Seven most common minutiae types (Maltoni et al., 2022)}}{6}{}%
 \contentsline {figure}{\numberline {2.2}{\ignorespaces A list of detected minutiae points and their attributes}}{7}{}%
 \contentsline {figure}{\numberline {2.3}{\ignorespaces A set of points subjected to Delaunay Triangulation}}{8}{}%
 \contentsline {figure}{\numberline {2.4}{\ignorespaces A Voronoi diagram consisting of Voronoi cells and their respective points}}{8}{}%
